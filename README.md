@@ -1,0 +1,2 @@
+# InfinitySolutionsAPI
+API infinity Solutions
