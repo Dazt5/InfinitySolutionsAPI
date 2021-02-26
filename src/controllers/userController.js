@@ -75,8 +75,8 @@ exports.signUp = async (req, res) => {
             email: user.email,
             subject: 'Confirma tu cuenta',
             view: 'confirmAccount',
-            url: 'Token'//TODO: TOKEN
-        });
+            url: `http://${process.env.HOST}:${process.env.PORT}/activate/${user._id}`
+        });         //TODO: FRONT URL FOR EMAIL AND AXIOS TO BACKEND IN ONLOAD 
 
         res.status(200).json({
             success: true,
@@ -122,25 +122,25 @@ exports.validateLogin = async (req, res, next) => {
     const { email, password } = req.body;
 
     if (!email) {
-        return res.status(200).json({
+        return res.status(400).json({
             success: false,
             message: 'Debe ingresar un email'
         });
 
     } else if (!validate.Email(email)) {
-        return res.status(200).json({
+        return res.status(400).json({
             success: false,
             message: 'Usuario o Contraseña Inválida'
         });
 
     } else if (!password) {
-        return res.status(200).json({
+        return res.status(400).json({
             success: false,
             message: 'Debe ingresar una Password'
         });
 
     } else if (!validate.Password(password)) {
-        return res.status(200).json({
+        return res.status(400).json({
             success: false,
             message: 'Usuario o Contraseña Inválida'
         });
@@ -149,7 +149,7 @@ exports.validateLogin = async (req, res, next) => {
     next();
 }
 
-exports.login = async (req, res, next) => {
+exports.login = async (req, res) => {
 
     const { email, password } = req.body;
 
@@ -175,7 +175,7 @@ exports.login = async (req, res, next) => {
 
             const token = await getToken(user.email);
 
-            res.status(200).json({
+            return res.status(200).json({
                 success: true,
                 token
             })
@@ -183,6 +183,42 @@ exports.login = async (req, res, next) => {
         }
 
     }
+}
+
+exports.activateAccount = async (req, res) => {
+
+    const { id } = req.params;
+
+    try {
+        const user = await User.findOneAndUpdate(
+            { _id: id },
+            { activated: 1 }
+            , {
+                new: true
+            });
+
+        if (!user) {
+            return res.status(401).json({
+                success: false,
+                message: 'No válido, intente de nuevo.'
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: 'Cuenta activada satisfactoriamente'
+        });
+
+    } catch (error) {
+        return res.status(401).json({
+            success: false,
+            message: 'No válido, intente de nuevo.'
+        });
+
+    }
+
+
+
 }
 
 

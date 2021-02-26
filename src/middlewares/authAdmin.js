@@ -1,9 +1,8 @@
-const jwt = require('jsonwebtoken');
 require('dotenv').config({ path: '.env' });
 
-const { decodeToken } = require('../libs/authToken');
+const { decodeToken, verifyToken } = require('../libs/authToken');
 
-//Model
+/*MONGOOSE SCHEMAS*/
 const User = require('../models/User');
 
 /*Verify Token*/
@@ -22,10 +21,10 @@ module.exports = async (req, res, next) => {
 
     res.locals.token = token;
 
-    let verifyToken;
+    let tokenVerified;
 
     try {
-        verifyToken = jwt.verify(token, process.env.ENCRYPTKEY);
+        tokenVerified = verifyToken(token);
 
     } catch (error) {
 
@@ -37,7 +36,7 @@ module.exports = async (req, res, next) => {
         }
     }
 
-    if (!verifyToken) {
+    if (!tokenVerified) {
         return res.status(401).json({
             success: false,
             message: 'Ha ocurrido un error verificando su sesión, intente iniciando sesión nuevamente'

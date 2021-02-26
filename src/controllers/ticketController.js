@@ -36,7 +36,7 @@ exports.validateTicket = (req, res, next) => {
     next();
 }
 
-exports.showUserTickets = async (_, res) => {
+exports.showAllUserTickets = async (_, res) => {
 
     const { email } = decodeToken(res.locals.token);
 
@@ -69,7 +69,7 @@ exports.showUserTickets = async (_, res) => {
 
 }
 
-exports.userTicket = async (req, res) => {
+exports.showUserTicket = async (req, res) => {
     const { id } = req.params;
     const { email } = decodeToken(res.locals.token);
 
@@ -104,7 +104,6 @@ exports.userTicket = async (req, res) => {
 exports.newTicket = async (req, res) => {
 
     const ticket = await Ticket(req.body);
-
     const { email } = decodeToken(res.locals.token);
 
     var user = await User.findOne({ email });
@@ -120,18 +119,16 @@ exports.newTicket = async (req, res) => {
         });
     }
     try {
-
         await ticket.save();
 
         return res.status(200).json({
             success: true,
             message: 'Ticket creado satisfactoriamente'
         });
-
     } catch (error) {
-
+        console.log(error);
         return res.status(500).json({
-            success: true,
+            success: false,
             message: 'Ha ocurrido un error inesperado'
         });
 

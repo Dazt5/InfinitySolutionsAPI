@@ -1,8 +1,12 @@
-const jwt = require('jsonwebtoken');
 require('dotenv').config({ path: '.env' });
 
-/*Verify Token*/
-module.exports = (req, res, next) => {
+const { decodeToken, verifyToken } = require('../libs/authToken');
+
+/*MONGOOSE SCHEMAS*/
+const User = require('../models/User');
+
+/*Verify Admin Token*/
+module.exports = async (req, res, next) => {
 
     const authHeader = req.get('Authorization');
 
@@ -17,14 +21,14 @@ module.exports = (req, res, next) => {
 
     res.locals.token = token;
 
-    let verifyToken;
+    let tokenVerified;
 
     try {
-        
-        verifyToken = jwt.verify(token, process.env.ENCRYPTKEY);
+
+        tokenVerified = verifyToken(token);
 
     } catch (error) {
-
+        console.log(error);
         if (error.name === 'TokenExpiredError') {
             return res.status(400).json({
                 success: false,
@@ -33,11 +37,28 @@ module.exports = (req, res, next) => {
         }
     }
 
-    if (!verifyToken) {
+    if (!tokenVerified) {
         return res.status(401).json({
             success: false,
             message: 'Ha ocurrido un error verificando su sesión, intente iniciando sesión nuevamente'
         });
+    }
+
+    const { email } = decodeToken(token);
+
+    const user = await User.findOne
+        ({
+            email,
+            activated: 1
+        });
+
+    if (!user) {
+
+        return res.status(403).json({
+            success: false,
+            message: 'La cuenta no está verificada'
+        });
+
     }
 
     next();

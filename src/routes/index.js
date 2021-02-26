@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const auth = require('../middlewares/auth');
+const authUser = require('../middlewares/authUser');
 const authAdmin = require('../middlewares/authAdmin');
 
 /*CONTROLLERS*/
@@ -14,8 +14,9 @@ const statusController = require('../controllers/statusController');
 
 module.exports = () => {
 
-    /*     USER ROUTES      */ 
-
+    /*------- USER ROUTES ---------*/
+    
+    /*AUTHENTICATION*/ 
     router.post('/signup',
         userController.validateSignup,
         userController.signUp
@@ -26,38 +27,55 @@ module.exports = () => {
         userController.login
     );
 
+    router.get('/activate/:id',
+        userController.activateAccount);
+
     /*TICKETS*/
     router.get('/ticket',
-        auth,
-        ticketController.showUserTickets
+        authUser,
+        ticketController.showAllUserTickets
     );
 
     router.get('/ticket/:id',
-        auth,
-        ticketController.userTicket
+        authUser,
+        ticketController.showUserTicket
     );
 
     router.post('/ticket/new',
-        auth,
+        authUser,
         ticketController.validateTicket,
         ticketController.newTicket
     );
 
     /*FAVORITES*/
-
     router.get('/favorite',
-        auth,
+        authUser,
         favoriteController.showFavorite
     );
 
     router.post('/favorite/new',
-        auth,
+        authUser,
+        favoriteController.validateFavorite,
         favoriteController.addFavorite
     );
 
+    router.delete('/favorite/:id',
+        authUser,
+        favoriteController.deleteFavorite
+    );
+
+    /*CORPORATION*/
+    router.get('/corporation/',
+        authUser,
+        corporationController.showAllCorporation);
+
+    router.get('/corporation/:id',
+        authUser,
+        corporationController.showCorporation);
+
     /*
         router.put('/ticket/:id',
-            auth,
+            authUser,
             ticketController.validateTicket,
             ticketController.editTicket
         );
@@ -67,9 +85,9 @@ module.exports = () => {
     */
 
 
-    /*      ADMIN ROUTES        */
+    /*------- ADMIN ROUTES ---------*/
 
-    //Corporation
+    //* CORPORATION */
     router.post('/corporation/new',
         authAdmin,
         corporationController.validateCorporation,
@@ -86,7 +104,7 @@ module.exports = () => {
         corporationController.deleteCompany
     );
 
-    //Status
+    /*STATUS*/
     router.post('/status/new',
         authAdmin,
         statusController.validateStatus,

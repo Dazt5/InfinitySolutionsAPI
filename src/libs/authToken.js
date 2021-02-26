@@ -1,5 +1,5 @@
 require('dotenv').config({ path: '.env' });
-const { sign, decode } = require('jsonwebtoken');
+const { sign, decode, verify } = require('jsonwebtoken');
 
 const SECRETKEY = process.env.ENCRYPTKEY;
 
@@ -20,5 +20,12 @@ exports.decodeToken = (token) => {
     );
 
     return tokenDecoded.payload;
+
+}
+
+exports.verifyToken = (token) =>{
+
+
+    return verify(token,SECRETKEY);
 
 }
