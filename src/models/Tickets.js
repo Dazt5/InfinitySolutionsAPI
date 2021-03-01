@@ -5,7 +5,7 @@ const AutoIncrement = require('mongoose-sequence')(mongoose);
 
 const ticketSchema = new Schema({
 
-    id:{
+    ticket_id: {    //is not unique, is an individual sequence for each user
         type: Number
     },
 
@@ -21,21 +21,21 @@ const ticketSchema = new Schema({
         default: Date.now()
     },
 
-    corporation:{ 
-        type:Schema.ObjectId,
-        ref:'Corporation'
+    corporation: {
+        type: Schema.ObjectId,
+        ref: 'Corporation'
     },
 
-    user: { 
-        type:Schema.ObjectId,
-        ref:'User'
-    }, 
+    user: {
+        type: Schema.ObjectId,
+        ref: 'User'
+    },
 
-    status:{ 
-        type:Schema.ObjectId,
-        ref:'Status'
+    status: {
+        type: Schema.ObjectId,
+        ref: 'Status'
     },
 });
 
-ticketSchema.plugin(AutoIncrement, {inc_field:'id'});
+ticketSchema.plugin(AutoIncrement, { inc_field: 'id', disable_hooks: true });
 module.exports = mongoose.model('Tickets', ticketSchema);

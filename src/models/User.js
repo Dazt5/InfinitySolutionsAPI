@@ -22,7 +22,7 @@ const userSchema = new Schema({
         type:String,
         trim:true
     },
-    img:String,
+    image:String,
 
     auth_level:{
         type: Number,

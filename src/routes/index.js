@@ -15,8 +15,8 @@ const statusController = require('../controllers/statusController');
 module.exports = () => {
 
     /*------- USER ROUTES ---------*/
-    
-    /*AUTHENTICATION*/ 
+
+    /*AUTHENTICATION*/
     router.post('/signup',
         authController.validateSignup,
         authController.signUp
@@ -27,8 +27,15 @@ module.exports = () => {
         authController.login
     );
 
-    router.get('/activate/:id',
-        authController.activateAccount);
+    router.post('/activate/',
+        authController.sendActivatedToken
+    );
+
+    router.get('/activate/:token',
+        authController.activateAccount
+    );
+
+    router.post('/recover/:token')
 
     /*TICKETS*/
     router.get('/ticket',

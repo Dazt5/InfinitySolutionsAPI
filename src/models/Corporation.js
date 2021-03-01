@@ -13,7 +13,7 @@ const corporationSchema = new Schema({
         trim:true,
         required:true
     },
-    imagen:{
+    image:{
         type:String,
         trim:true,
         required:true

@@ -5,34 +5,37 @@ exports.validateCorporation = async (req, res, next) => {
     const { name, rif, imagen } = req.body;
 
     if (!name) {
-
         return res.status(400).json({
             success: false,
             message: 'El nombre está vacio'
         });
 
     } else if (!rif) {
-
         return res.status(400).json({
             success: false,
             message: 'El RIF es obligatorio'
         });
-    } else if (!imagen) {
 
+    } else if (!image) {
         return res.status(400).json({
             success: false,
             message: 'Debe colocar una imagen'
         });
     }
-
     next();
 }
 
 exports.newCorporation = async (req, res) => {
-    const corporation = new Corporation(req.body);
+
+    const { name, rif, image } = req.body;
+
+    const corporation = new Corporation({
+        name,
+        rif,
+        image
+    });
 
     try {
-
         await corporation.save();
 
         return res.status(200).json({
@@ -47,7 +50,6 @@ exports.newCorporation = async (req, res) => {
             message: 'Ha ocurrido un error inesperado'
         });
     }
-
 }
 
 exports.editCorporation = async (req, res) => {
@@ -60,18 +62,17 @@ exports.editCorporation = async (req, res) => {
                 new: true
             });
 
+        if (!corporation) {
+            return res.status(404).json({
+                success: false,
+                message: 'La empresa ingresada no coincide con ninguna registrada'
+            });
+        }
+
         res.status(200).json({
             success: true,
             message: 'Empresa actualizado correctamente.'
         })
-
-        if (!corporation) {
-            return res.status(401).json({
-                success: false,
-                message: 'La empresa que ha ingresado no es válida'
-            });
-        }
-
     } catch (error) {
         console.log(error);
         return res.status(500).json({
@@ -92,12 +93,11 @@ exports.deleteCompany = async (req, res) => {
             success: true,
             message: 'Compañia Eliminada correctamente'
         });
-
     } catch (error) {
         console.log(error);
         return res.status(500).json({
             success: true,
-            message: 'Ha ocurrido un error.'
+            message: 'Ha ocurrido un error inespeado.'
 
         });
     }
@@ -109,16 +109,16 @@ exports.showAllCorporation = async (_, res) => {
 
         const corporation = await Corporation.find();
 
-        if (!corporation.length) {
-            return res.status(400).json({
+        if (!corporation) {
+            return res.status(404).json({
                 success: false,
-                message: 'No se encontraron compañias'
+                message: 'las compañias solicitadas no existen'
             })
         }
 
         return res.status(200).json({
             success: true,
-            corporation
+            corporation //can go empty => []
         });
 
     } catch (error) {
@@ -129,8 +129,6 @@ exports.showAllCorporation = async (_, res) => {
         });
 
     }
-
-
 }
 
 exports.showCorporation = async (req, res) => {
@@ -138,13 +136,12 @@ exports.showCorporation = async (req, res) => {
     const { id } = req.params;
 
     try {
-
         const corporation = await Corporation.findOne({
             _id: id
         });
 
         if (!corporation) {
-            return res.status(400).json({
+            return res.status(404).json({
                 success: false,
                 message: 'No se ha encontrado esa compañia'
             });
@@ -164,15 +161,13 @@ exports.showCorporation = async (req, res) => {
 }
 
 /* COMPANY CONTACT INFO */
-exports.addAddress = async (req,res) =>{
+exports.addAddress = async (req, res) => {
 
-    const { id} = req.params;
+    const { id } = req.params;
 
     console.log(id);
 
     res.status(200).send({
-        message:'Test'
+        message: 'Test'
     });
-
-
 }

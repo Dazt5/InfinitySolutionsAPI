@@ -8,7 +8,7 @@ const { decodeToken } = require('../libs/authToken');
 
 exports.validateFavorite = (req, res, next) => {
 
-    const { corporation, user } = req.body;
+    const { corporation, user_id } = req.body;
 
     if (!corporation || !mongoose.Types.ObjectId(corporation)) {
 
@@ -17,69 +17,77 @@ exports.validateFavorite = (req, res, next) => {
             message: 'ID de la empresa inválido'
         });
 
-    } else if (!user || !mongoose.Types.ObjectId(user)) {
+    } else if (!user_id || !mongoose.Types.ObjectId(user)) {
 
         return res.status(400).json({
             success: false,
             message: 'ID del usuario inválido'
         });
-
     }
-
     next();
 }
-
 
 exports.showFavorite = async (_, res) => {
 
     const { email } = decodeToken(res.locals.token);
 
-    const user = await User.findOne({
-        email
-    });
+    try {
+        const user = await User.findOne({
+            email
+        });
 
-    if (!user) {
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'Sus credenciales no coinciden con un usuario registrado'
+            });
+        }
+
+        const favorite = await Favorite.find({
+            user: user.id
+        }).populate('user').populate('corporation');
+
+        if (!favorite) {
+            return res.status(404).json({
+                success: false,
+                message: 'El favorito que está buscando no existe'
+            });
+        }
+        return res.status(200).json({
+            success: true,
+            favorite
+        });
+    } catch (error) {
+        console.log(error);
         return res.status(500).json({
             success: false,
-            message: 'Error procesando la solicitud'
+            message: 'Ha ocurrido un error inesperado'
         });
     }
-    const favorite = await Favorite.find({
-        user: user.id
-    }).populate('user').populate('corporation');
-
-    if (!favorite) {
-
-        return res.status(500).json({
-            success: false,
-            message: 'Error procesando la solicitud'
-        });
-    }
-    return res.status(200).json({
-        success: true,
-        favorite
-    });
-
 }
 
 exports.addFavorite = async (req, res) => {
 
     const { email } = decodeToken(res.locals.token);
-    const { user } = req.body;
+    const { user_id, corporation } = req.body;
 
-    const Users = await User.findOne(
+    const user = await User.findOne(
         {
             email,
-            _id: user
+            _id: user_id
         });
 
-    if (!Users || Users.id != user) {
-        return res.status(400).json({
+    if (!user) {
+        return res.status(404).json({
             success: false,
-            message: 'Error procesando los datos'
+            message: 'Sus credenciales no coinciden con un usuario registrado'
         });
     }
-    const favorite = Favorite(req.body);
+    const favorite = Favorite(
+        {
+            user: user_id,
+            corporation
+        });
 
     try {
         await favorite.save();
@@ -88,7 +96,6 @@ exports.addFavorite = async (req, res) => {
             success: true,
             message: 'Favorito Agregado'
         });
-
     } catch (error) {
         console.log(error);
         return res.status(500).json({
@@ -103,31 +110,34 @@ exports.deleteFavorite = async (req, res) => {
     const { email } = decodeToken(res.locals.token);
     const { id } = req.params;
 
-    const user = await User.findOne(
-        {
-            email,
-        });
-
     try {
+        const user = await User.findOne(
+            {
+                email,
+            });
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'Sus credenciales no coinciden con un usuario registrado'
+            });
+        }
 
         await Favorite.findOneAndDelete({
             _id: id,
             user: user.id,
-
         });
 
         res.status(200).json({
             success: true,
-            message: 'Eliminado'
+            message: 'El favorito fue eliminado'
         })
 
     } catch (error) {
-
         console.log(error)
         return res.status(500).json({
             success: false,
             message: 'Ha ocurrido un error procesando la solicitud'
         });
-
     }
 }

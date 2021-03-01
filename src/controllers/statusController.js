@@ -26,7 +26,6 @@ exports.newStatus = async (req, res) => {
     const status = new Status(req.body);
 
     try {
-
         const existDefault = await Status.find({ default: 1 });
 
         (!existDefault.length) ? status.default = 1 : status.default = 0;
