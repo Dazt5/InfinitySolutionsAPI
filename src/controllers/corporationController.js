@@ -119,20 +119,19 @@ exports.showAllCorporation = async (_, res) => {
         return res.status(200).json({
             success: true,
             corporation
-        })
+        });
 
     } catch (error) {
         console.log(error);
         return res.status(500).json({
             success: false,
             message: 'Ha ocurrido un error procesando la solicitud'
-        })
+        });
 
     }
 
 
 }
-
 
 exports.showCorporation = async (req, res) => {
 
@@ -148,21 +147,32 @@ exports.showCorporation = async (req, res) => {
             return res.status(400).json({
                 success: false,
                 message: 'No se ha encontrado esa compañia'
-            })
+            });
         }
 
         return res.status(200).json({
             success: true,
             corporation
-        })
+        });
 
     } catch (error) {
         return res.status(500).json({
             success: false,
             message: 'Ha ocurrido un error procesando la solicitud'
-        })
-
+        });
     }
+}
+
+/* COMPANY CONTACT INFO */
+exports.addAddress = async (req,res) =>{
+
+    const { id} = req.params;
+
+    console.log(id);
+
+    res.status(200).send({
+        message:'Test'
+    });
 
 
 }

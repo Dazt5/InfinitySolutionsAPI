@@ -5,7 +5,7 @@ const { decodeToken, verifyToken } = require('../libs/authToken');
 /*MONGOOSE SCHEMAS*/
 const User = require('../models/User');
 
-/*Verify Admin Token*/
+
 module.exports = async (req, res, next) => {
 
     const authHeader = req.get('Authorization');
@@ -56,7 +56,7 @@ module.exports = async (req, res, next) => {
 
         return res.status(403).json({
             success: false,
-            message: 'La cuenta no está verificada'
+            message: 'La cuenta no está activada'
         });
 
     }

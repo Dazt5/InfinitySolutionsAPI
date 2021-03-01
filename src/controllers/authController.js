@@ -192,7 +192,7 @@ exports.activateAccount = async (req, res) => {
     try {
         const user = await User.findOneAndUpdate(
             { _id: id },
-            { activated: 1 }
+            { activated: 0 }
             , {
                 new: true
             });

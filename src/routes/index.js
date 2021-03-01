@@ -4,7 +4,7 @@ const authUser = require('../middlewares/authUser');
 const authAdmin = require('../middlewares/authAdmin');
 
 /*CONTROLLERS*/
-const userController = require('../controllers/userController');
+const authController = require('../controllers/authController');
 const ticketController = require('../controllers/ticketController');
 const favoriteController = require('../controllers/favoriteController');
 
@@ -18,17 +18,17 @@ module.exports = () => {
     
     /*AUTHENTICATION*/ 
     router.post('/signup',
-        userController.validateSignup,
-        userController.signUp
+        authController.validateSignup,
+        authController.signUp
     );
 
     router.post('/login',
-        userController.validateLogin,
-        userController.login
+        authController.validateLogin,
+        authController.login
     );
 
     router.get('/activate/:id',
-        userController.activateAccount);
+        authController.activateAccount);
 
     /*TICKETS*/
     router.get('/ticket',
@@ -103,6 +103,13 @@ module.exports = () => {
         authAdmin,
         corporationController.deleteCompany
     );
+
+    /*CORPORATION CONTACT INFORMATIÓN*/
+    /*CORPORATION ADDRESS*/
+    router.post('/corporation/:id/address/new',
+        authAdmin,
+        corporationController.addAddress);
+
 
     /*STATUS*/
     router.post('/status/new',

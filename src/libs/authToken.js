@@ -14,18 +14,14 @@ exports.getToken = async (email) => {
 
 exports.decodeToken = (token) => {
 
-
     var tokenDecoded = decode(token,
         { complete: true }
     );
 
     return tokenDecoded.payload;
-
 }
 
 exports.verifyToken = (token) =>{
 
-
     return verify(token,SECRETKEY);
-
 }

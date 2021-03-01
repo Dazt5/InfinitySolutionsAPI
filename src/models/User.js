@@ -32,12 +32,18 @@ const userSchema = new Schema({
         type:Number,
         default:0
     },
-    token:String,
-    expiration_token:Date,
+
+    activatedToken:String,
+    activatedExpirationToken:Date,
+
+    recoveryToken:String,
+    recoveryExpirationToken:Date,
+
     create_at:{
         type:Date,
         default: Date.now()
-    }
+    },
+    last_access:Date
 });
 
 
