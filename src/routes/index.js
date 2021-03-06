@@ -17,12 +17,12 @@ module.exports = () => {
     /*------- USER ROUTES ---------*/
 
     /*AUTHENTICATION*/
-    router.post('/signup',
+    router.post('/signup/',
         authController.validateSignup,
         authController.signUp
     );
 
-    router.post('/login',
+    router.post('/login/',
         authController.validateLogin,
         authController.login
     );
@@ -35,10 +35,20 @@ module.exports = () => {
         authController.activateAccount
     );
 
-    router.post('/recover/:token')
+    router.post('/recover/',
+        authController.sendRecoverToken
+    );
+
+    router.get('/recover/:token',
+        authController.validateRecoveryToken
+    );
+
+    router.post('/recover/:token',
+        authController.recoverAccount
+    );
 
     /*TICKETS*/
-    router.get('/ticket',
+    router.get('/ticket/',
         authUser,
         ticketController.showAllUserTickets
     );
@@ -55,7 +65,7 @@ module.exports = () => {
     );
 
     /*FAVORITES*/
-    router.get('/favorite',
+    router.get('/favorite/',
         authUser,
         favoriteController.showFavorite
     );
@@ -79,18 +89,6 @@ module.exports = () => {
     router.get('/corporation/:id',
         authUser,
         corporationController.showCorporation);
-
-    /*
-        router.put('/ticket/:id',
-            authUser,
-            ticketController.validateTicket,
-            ticketController.editTicket
-        );
-    
-        router.delete('/delete/:id',
-            auth);
-    */
-
 
     /*------- ADMIN ROUTES ---------*/
 

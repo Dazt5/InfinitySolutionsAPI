@@ -41,5 +41,4 @@ exports.send = async (options) => {
 
     const sendMail = util.promisify(transport.sendMail, transport);
     return sendMail.call(transport, optionsEmail);
-
 }

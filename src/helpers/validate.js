@@ -12,6 +12,7 @@ Minimo 1 Mayuscula,
 Minimo 1 Minuscula,
 Minimo 1 Numero,
 De 8 a 20 caracteres,
+No se aceptan simbolos ni la ñ
 */
 exports.Password = (password) =>{
 

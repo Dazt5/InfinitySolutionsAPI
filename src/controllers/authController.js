@@ -36,7 +36,7 @@ exports.validateSignup = async (req, res, next) => {
     } else if (!validate.Password(password)) {
         return res.status(400).json({
             success: false,
-            message: 'La contraseña tiene caracteres no permitidos'
+            message: 'La contraseña ingresada no tiene los parametros requeridos'
         });
     } else if (!fullname) {
         return res.status(400).json({
@@ -56,7 +56,6 @@ exports.validateSignup = async (req, res, next) => {
             message: 'Debe ingresar un numero teléfonico'
         });
     }
-
     next();
 }
 
@@ -72,7 +71,6 @@ exports.signUp = async (req, res) => {
     });
 
     try {
-
         const hashedPassword = await hashPassword(user.password);
 
         user.password = hashedPassword;
@@ -105,12 +103,12 @@ exports.signUp = async (req, res) => {
 
                 for (var field in error.keyPattern) {
                     if (error.keyPattern.hasOwnProperty(field)) {
-                        duplicateKey = field
+                        duplicateKey += ' ' + field
                     }//find duplicate key
                 }
                 return res.status(400).json({
                     success: false,
-                    message: `El ${duplicateKey} ya está registrado`
+                    message: ` ${duplicateKey} Ya se encuentra registrado`
                 });
             } else {
                 return res.status(500).json({
@@ -238,7 +236,7 @@ exports.sendActivatedToken = async (req, res) => {
             subject: 'Confirma tu cuenta',
             view: 'confirmAccount',
             url: `http://${process.env.HOST}:${process.env.PORT}/activate/${user.activatedToken}`
-        });         //TODO: FRONT URL FOR EMAIL 
+        });         //TODO: FRONT URL
 
         return res.status(200).json({
             success: true,
@@ -293,4 +291,126 @@ exports.activateAccount = async (req, res) => {
 }
 
 /* RECOVER ACCOUNT */
+exports.sendRecoverToken = async (req, res) => {
 
+    const { email } = req.body;
+
+    try {
+        const user = await User.findOne({
+            email
+        });
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'El email ingresado no está registrado.'
+            });
+        }
+
+        user.recoveryToken = randomBytes(20).toString('hex');
+        user.recoveryExpirationToken = Date.now() + (1600 * 1000 * 24);
+
+        await user.save();
+
+        sendEmail.send({
+            email: user.email,
+            subject: 'Recupera tu contraseña',
+            view: 'recoverAccount',
+            url: `http://${process.env.HOST}:${process.env.PORT}/recover/${user.recoveryToken}`
+        });             //TODO: FRONT URL
+
+        return res.status(200).json({
+            success: true,
+            message: 'Se ha envíado el correo de recuperación'
+        });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            success: false,
+            message: 'Ha ocurrido un error inesperado'
+        });
+    }
+}
+
+exports.validateRecoveryToken = async (req, res) => {
+
+    const { token } = req.params;
+
+    try {
+        const user = await User.findOne({
+            recoveryToken: token,
+            recoveryExpirationToken: {
+                $gt: Date.now()
+            }
+        });
+
+        console.log(user);
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'El link es inválido o ha expirado, solicitelo de nuevo'
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: 'Ingresa la nueva contraseña'
+        });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            success: false,
+            message: 'Ha ocurrido un error inesperado'
+        });
+    }
+}
+
+exports.recoverAccount = async (req, res) => {
+
+    const { token } = req.params;
+
+    const { password } = req.body;
+
+    if (!validate.Password(password)) {
+        return res.status(400).json({
+            success: false,
+            message: 'La contraseña ingresada no tiene los parametros requeridos'
+        });
+    }
+
+    try {
+        const user = await User.findOne({
+            recoveryToken: token,
+            recoveryExpirationToken: {
+                $gt: Date.now()
+            }
+        });
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'El link es inválido o ha expirado, solicitelo de nuevo'
+            });
+        }
+
+        user.password = await hashPassword(password);
+
+        user.recoveryToken = null;
+        user.recoveryExpirationToken = null;
+
+        await user.save();
+
+        return res.status(200).json({
+            success: true,
+            message: 'La contraseña ha sido actualizada correctamente'
+        });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            success: false,
+            message: 'Ha ocurrido un error inesperado'
+        });
+    }
+
+}
