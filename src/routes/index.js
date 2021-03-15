@@ -110,11 +110,33 @@ module.exports = () => {
     );
 
     /*CORPORATION CONTACT INFORMATIÓN*/
-    /*CORPORATION ADDRESS*/
-    router.post('/corporation/:id/address/new',
-        authAdmin,
-        corporationController.addAddress);
 
+    router.get('/corporation/:id/contact/',
+        authAdmin,
+        corporationController.showAllContactInfo
+    );
+
+    router.get('/corporation/contact/:id',
+        authAdmin,
+        corporationController.showContactInfo
+    );
+
+    router.post('/corporation/contact/new',
+        authAdmin,
+        corporationController.validateContactInfo,
+        corporationController.newContactInfo
+    );
+
+    router.delete('/corporation/contact/:id/',
+        authAdmin,
+        corporationController.deleteContactInfo
+    );
+
+    router.put('/corporation/contact/:id/',
+        authAdmin,
+        corporationController.validateContactInfo,
+        corporationController.editContactInfo
+    );
 
     /*STATUS*/
     router.post('/status/new',
