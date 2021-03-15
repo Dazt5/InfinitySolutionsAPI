@@ -6,7 +6,6 @@ require('./middlewares/createDefaultAdmin');
 /*IMPORTS */
 const express = require('express');
 require('dotenv').config({ path: '.env' });
-const bodyParser = require('body-parser');
 const cors = require('cors');
 const helmet = require('helmet');
 
@@ -15,8 +14,8 @@ const router = require('./routes/index');
 
 const app = express();
 
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 app.use(cors());
 app.use(helmet());
