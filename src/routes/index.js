@@ -123,7 +123,7 @@ module.exports = () => {
 
     router.post('/corporation/document/new',
         authAdmin,
-        corporationController.uploadFile,
+        corporationController.uploadDocument,
         corporationController.newCorporationDocument
     );
 

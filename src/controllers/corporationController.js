@@ -7,20 +7,31 @@ const multer = require('multer');
 const shortid = require('shortid');
 
 const configurationUploadPicture = {
+    limits: {fileSize: 4096000},
     storage: fileStorage = multer.diskStorage({
         destination: (req, file, cb) => {
             cb(null, __dirname + '../../uploads/corporation/picture/')
 
         },
-        filename: (req, file, cb) => {
-            const extension = file.mimetype.split('/')[1];
+        filename: (req, file, cb) => {//MUCHO CUIDADO CON EL ORDEN EN EL QUE ESE ENVÍAN LOS DATOS
+            const extension = file.mimetype.split('/')[1]; //EL ARCHIVO DEBE SER LO ULTIMO QUE SE ENVÍE
             cb(null, `${shortid.generate()}.${extension}`);
 
         }
     }),
-    fileFilter(req, file, cb) {
+    fileFilter(req, file, cb) {   
 
-        if (file.mimetype === 'image/jpeg' || file.mimetype === 'image/png') {
+        const { name, rif } = req.body;
+
+        if (!name) {
+            cb(new Error('Debe ingresar un nombre a la corporación'));
+        }
+
+        if (!rif) {
+            cb(new Error('Debe ingresar un RIF'));
+        }
+
+        if (file.mimetype === 'image/jpeg' || file.mimetype === 'image/jpg' || file.mimetype === 'image/png') {
 
             cb(null, true);
 
@@ -38,25 +49,19 @@ exports.uploadPicture = (req, res, next) => {
 
     uploadPicture(req, res, (error) => {
 
-        const { name, rif } = req.body;
-
         if (error) {
             return res.status(400).json({
                 success: false,
-                message: 'Asegurese que su imagen cumpla con el formato y peso establecido'
+                message: error.message
             });
         }
 
-        if (!name) {
-            return res.status(400).json({
-                success: false,
-                message: 'El nombre está vacio'
-            });
+        console.log(req.body);
 
-        } else if (!rif) {
+        if(!req.file){
             return res.status(400).json({
                 success: false,
-                message: 'El RIF es obligatorio'
+                message: 'Debe subir una imagen de la corporación'
             });
         }
 
@@ -71,17 +76,15 @@ exports.newCorporation = async (req, res) => {
 
     const corporation = new Corporation({
         name,
-        rif,
+        rif
     });
 
     try {
 
         if (req.file) {
             corporation.image = req.file.filename
-        } else {
-            corporation.image = 'default.png'
         }
-
+        
         await corporation.save();
 
         return res.status(200).json({
@@ -207,8 +210,8 @@ exports.showCorporation = async (req, res) => {
     }
 }
 
-const configurationUploadDocument = {
-    limits: { fileSize: 4096000 },
+const configurationUploadDocument = { //MUCHO CUIDADO CON EL ORDEN EN EL QUE ESE ENVÍAN LOS DATOS
+    limits: { fileSize: 4096000 },    //EL ARCHIVO DEBE SER LO ULTIMO QUE SE ENVÍE
     storage: fileStorage = multer.diskStorage({
         destination: (req, file, cb) => {
             cb(null, __dirname + '../../uploads/corporation/document/')
@@ -224,21 +227,17 @@ const configurationUploadDocument = {
 
         const { name, idCorporation } = req.body;
 
+        if (!name) {
+            cb(new Error('Debe ingresar un nombre al archivo'));
+        }
+
+        if (!idCorporation) {
+            cb(new Error('Debe seleccionar una corporacion'));
+        }
+
         if (file.mimetype === 'application/pdf') {
 
-            if (!name) {
-
-                cb(new Error('Debe ingresar un nombre al documentos'));
-
-            } else if (!idCorporation) {
-
-                cb(new Error('Debe seleccionar una empresa'));
-
-            } else {
-
-                cb(null, true);
-
-            }
+            cb(null, true);
 
         } else {
 
@@ -248,30 +247,19 @@ const configurationUploadDocument = {
     },
 }
 
-const uploadFile = multer(configurationUploadDocument).single('document');
+const uploadDocument = multer(configurationUploadDocument).single('document');
 
-exports.uploadFile = (req, res, next) => {
+exports.uploadDocument = (req, res, next) => {
 
-    uploadFile(req, res, (error) => {
-        
-        if(!req.file){
-            return res.status(400).json({
-                success: false,
-                message: 'Debe seleccionar un archivo'
-            });
-        }
+    uploadDocument(req, res, (error) => {
 
         if (error) {
             if (error instanceof multer.MulterError) {
+
                 if (error.code === 'LIMIT_FILE_SIZE') {
                     return res.status(400).json({
                         success: false,
                         message: 'El archivo es muy pesado, El maximo aceptado son 4Mb '
-                    });
-                } else {
-                    return res.status(500).json({
-                        success: false,
-                        message: 'Asegurese que su imagen cumpla con el formato y peso establecido'
                     });
                 }
 
@@ -282,6 +270,13 @@ exports.uploadFile = (req, res, next) => {
                     message: error.message
                 });
             }
+        }
+
+        if (!req.file) {
+            return res.status(401).json({
+                success: false,
+                message: 'No ha seleccionado un archivo'
+            });
         }
 
         return next();
