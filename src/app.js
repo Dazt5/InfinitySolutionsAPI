@@ -1,6 +1,6 @@
-/*MONGODB*/ 
+/*MONGODB*/
 require('./config/db');
-/*DEFAULT USER MIDDLEWARE*/ 
+/*DEFAULT USER MIDDLEWARE*/
 require('./middlewares/createDefaultAdmin');
 
 /*IMPORTS */
@@ -21,14 +21,13 @@ app.use(cors());
 app.use(helmet());
 
 /*public folders*/
-app.use(express.static('./uploads'));
+app.use(express.static('./src/uploads'));
 
 /*ROUTES*/
 app.use(router());
 
 /*SERVER*/
 const port = process.env.PORT || 5001;
-
 const host = process.env.HOST || '127.0.0.1';
 
 app.listen(port, host, () => {

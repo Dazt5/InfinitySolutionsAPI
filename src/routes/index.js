@@ -17,17 +17,17 @@ module.exports = () => {
     /*------- USER ROUTES ---------*/
 
     /*AUTHENTICATION*/
-    router.post('/signup/',
+    router.post('/signup',
         authController.validateSignup,
         authController.signUp
     );
 
-    router.post('/login/',
+    router.post('/login',
         authController.validateLogin,
         authController.login
     );
 
-    router.post('/activate/',
+    router.post('/activate',
         authController.sendActivatedToken
     );
 
@@ -35,7 +35,7 @@ module.exports = () => {
         authController.activateAccount
     );
 
-    router.post('/recover/',
+    router.post('/recover',
         authController.sendRecoverToken
     );
 
@@ -48,12 +48,12 @@ module.exports = () => {
     );
 
     /*TICKETS*/
-    router.get('/ticket/',
+    router.get('/ticket',
         authUser,
         ticketController.showAllUserTickets
     );
 
-    router.get('/ticket/:id',
+    router.get('/ticket/:idTicket',
         authUser,
         ticketController.showUserTicket
     );
@@ -65,7 +65,7 @@ module.exports = () => {
     );
 
     /*FAVORITES*/
-    router.get('/favorite/',
+    router.get('/favorite',
         authUser,
         favoriteController.showFavorite
     );
@@ -82,7 +82,7 @@ module.exports = () => {
     );
 
     /*CORPORATION*/
-    router.get('/corporation/',
+    router.get('/corporation',
         authUser,
         corporationController.showAllCorporation);
 
@@ -95,12 +95,12 @@ module.exports = () => {
     //* CORPORATION */
     router.post('/corporation/new',
         authAdmin,
-        corporationController.validateCorporation,
-        corporationController.newCorporation);
+        corporationController.uploadPicture,
+        corporationController.newCorporation
+    );
 
     router.put('/corporation/:id',
         authAdmin,
-        corporationController.validateCorporation,
         corporationController.editCorporation
     );
 
@@ -109,14 +109,37 @@ module.exports = () => {
         corporationController.deleteCompany
     );
 
+    /* CORPORATION DOCUMENTS */
+
+    router.get('/corporation/:idCorporation/document',
+        authAdmin,
+        corporationController.showAllCorporationDocuments
+    );
+
+    router.get('/corporation/document/:idDocument',
+        authAdmin,
+        corporationController.showDocument
+    );
+
+    router.post('/corporation/document/new',
+        authAdmin,
+        corporationController.uploadFile,
+        corporationController.newCorporationDocument
+    );
+
+    router.delete('/corporation/document/:idDocument',
+        authAdmin,
+        corporationController.showDocument
+    );
+
     /*CORPORATION CONTACT INFORMATIÓN*/
 
-    router.get('/corporation/:id/contact/',
+    router.get('/corporation/:idCorporation/contact',
         authAdmin,
         corporationController.showAllContactInfo
     );
 
-    router.get('/corporation/contact/:id',
+    router.get('/corporation/contact/:idContact',
         authAdmin,
         corporationController.showContactInfo
     );
@@ -127,28 +150,31 @@ module.exports = () => {
         corporationController.newContactInfo
     );
 
-    router.delete('/corporation/contact/:id/',
+     router.put('/corporation/contact/:idContact',
+        authAdmin,
+        corporationController.editContactInfo
+    );
+
+    router.delete('/corporation/contact/:idContact',
         authAdmin,
         corporationController.deleteContactInfo
     );
 
-    router.put('/corporation/contact/:id/',
-        authAdmin,
-        corporationController.validateContactInfo,
-        corporationController.editContactInfo
-    );
-
     /*STATUS*/
+
+    //TODO GET ROUTE
+
     router.post('/status/new',
         authAdmin,
         statusController.validateStatus,
         statusController.newStatus
     );
-    router.put('/status/:id',
+
+    router.put('/status/:idStatus',
         authAdmin,
         statusController.editStatus
     );
-    router.delete('/status/:id',
+    router.delete('/status/:idStatus',
         authAdmin,
         statusController.deleteStatus)
 
