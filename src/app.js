@@ -7,9 +7,9 @@ const notFoundHandler = require('./middlewares/notFoundHandler');
 
 /*IMPORTS */
 const express = require('express');
-require('dotenv').config({ path: '.env' });
 const cors = require('cors');
 const helmet = require('helmet');
+const {config} = require('./config/index');
 
 /*- Import router -*/
 const router = require('./routes/index');
@@ -27,14 +27,14 @@ app.use(express.static('./src/uploads'));
 
 /*ROUTES*/
 app.use(router());
-//Not found route handler
+
 app.use(notFoundHandler);
 
 
 
 /*SERVER*/
-const port = process.env.PORT || 5001;
-const host = process.env.HOST || '127.0.0.1';
+const port = config.port || 5001;
+const host = config.host || '127.0.0.1';
 
 app.listen(port, host, () => {
 

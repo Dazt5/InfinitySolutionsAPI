@@ -1,15 +1,31 @@
+const { config } = require('../config/index');
 const mongoose = require('mongoose');
-require('dotenv').config({path: '.env'});
 
-mongoose.connect(process.env.MONGO_DB, {
-    useUnifiedTopology:true,
-    useNewUrlParser:true,
-    useCreateIndex:true
+const DB_NAME = config.dbName;
+let MONGO_URI;
+
+if (config.dbLocal) {
+    const DB_LOCAL = config.dbLocal
+
+    MONGO_URI = `${DB_LOCAL}/${DB_NAME}`
+} else {
+    const USER = encodeURIComponent(config.dbUser);
+    const PASSWORD = encodeURIComponent(config.dbPassword);
+    const DB_NAME = config.dbName;
+
+    MONGO_URI = `mongodb+srv://${USER}:${PASSWORD}@${config.dbHost}:${config.dbPort}/${DB_NAME}?retryWrites=true&w=majority`
+
+}
+
+mongoose.connect(MONGO_URI, {
+    useUnifiedTopology: true,
+    useNewUrlParser: true,
+    useCreateIndex: true
 });
-/*MONGO ATLAS CONNECT*/
- mongoose.connection.on('error', async (error) => {
+/*MONGO CONNECT*/
+mongoose.connection.on('error', async (error) => {
     console.log(error);
 })
 
-/* MODELS */ 
+/* MODELS */
 require('../models/User');
