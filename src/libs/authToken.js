@@ -7,7 +7,7 @@ exports.getToken = async (email) => {
 
     const token = sign({ email },
         SECRETKEY,
-        { expiresIn: '1d' });
+        { expiresIn: '60d' });
 
     return token;
 };

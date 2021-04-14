@@ -41,9 +41,9 @@ exports.showAllUserTickets = async (_, res) => {
         const user = await User.findOne({ email });
 
         if (!user) {
-            return res.status(401).json({
+            return res.status(404).json({
                 success: false,
-                message: 'No se ha podido procesar la solicitud'
+                message: 'El usuario no existe'
             });
         }
 
@@ -71,7 +71,7 @@ exports.showAllUserTickets = async (_, res) => {
 }
 
 exports.showUserTicket = async (req, res) => {
-    const { id } = req.params;
+    const { idTicket } = req.params;
     const { email } = decodeToken(res.locals.token);
 
     try {
@@ -86,7 +86,7 @@ exports.showUserTicket = async (req, res) => {
 
         const ticket = await Ticket.findOne(
             {
-                _id: id,
+                _id: idTicket,
                 user: user._id
             }).populate('user').populate('corporation').populate('status');
 
@@ -112,7 +112,14 @@ exports.showUserTicket = async (req, res) => {
 
 exports.newTicket = async (req, res) => {
 
-    const ticket = await Ticket(req.body);
+    const { subject, description, corporation } = req.body;
+
+    const ticket = await Ticket({
+        subject,
+        description,
+        corporation
+    });
+    
     const { email } = decodeToken(res.locals.token);
 
     try {

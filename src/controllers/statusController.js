@@ -50,10 +50,10 @@ exports.newStatus = async (req, res) => {
 
 exports.editStatus = async (req, res) => {
 
-    const { id } = req.params;
+    const { idStatus } = req.params;
 
     try {
-        const status = await Status.findOneAndUpdate({ _id: id },
+        const status = await Status.findOneAndUpdate({ _id: idStatus },
             req.body,
             {
                 new: true
@@ -81,11 +81,11 @@ exports.editStatus = async (req, res) => {
 
 exports.deleteStatus = async (req, res) => {
 
-    const { id } = req.params;
+    const { idStatus } = req.params;
 
     try {
 
-        await Status.findOneAndDelete({ _id: id });
+        await Status.findOneAndDelete({ _id: idStatus });
 
         res.status(200).json({
             success: true,

@@ -355,6 +355,7 @@ exports.validateRecoveryToken = async (req, res) => {
             success: true,
             message: 'Ingresa la nueva contraseña'
         });
+        
     } catch (error) {
         console.log(error);
         return res.status(500).json({
