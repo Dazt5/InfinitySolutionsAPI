@@ -1,7 +1,9 @@
 /*MONGODB*/
 require('./config/db');
-/*DEFAULT USER MIDDLEWARE*/
+/*MIDDLEWARES*/
 require('./middlewares/createDefaultAdmin');
+
+const notFoundHandler = require('./middlewares/notFoundHandler');
 
 /*IMPORTS */
 const express = require('express');
@@ -25,6 +27,10 @@ app.use(express.static('./src/uploads'));
 
 /*ROUTES*/
 app.use(router());
+//Not found route handler
+app.use(notFoundHandler);
+
+
 
 /*SERVER*/
 const port = process.env.PORT || 5001;
