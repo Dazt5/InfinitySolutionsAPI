@@ -3,16 +3,17 @@ require('./config/db');
 /*MIDDLEWARES*/
 require('./middlewares/createDefaultAdmin');
 
-const notFoundHandler = require('./middlewares/notFoundHandler');
+const notFoundHandler = require('./middlewares/errorHandler/notFoundHandler');
 
 /*IMPORTS */
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
-const {config} = require('./config/index');
+const { config } = require('./config/index');
 
 /*- Import router -*/
 const router = require('./routes/index');
+const { logErrors, wrapErrors, errorHandler } = require('./middlewares/errorHandler/errorHandler');
 
 const app = express();
 
@@ -28,9 +29,12 @@ app.use(express.static('./src/uploads'));
 /*ROUTES*/
 app.use(router());
 
+//ERROR MIDDLEWARES
 app.use(notFoundHandler);
 
-
+app.use(logErrors);
+app.use(wrapErrors);
+app.use(errorHandler);
 
 /*SERVER*/
 const port = config.port || 5001;

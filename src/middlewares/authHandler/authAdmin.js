@@ -1,9 +1,7 @@
-require('dotenv').config({ path: '.env' });
-
-const { decodeToken, verifyToken } = require('../libs/authToken');
+const { decodeToken, verifyToken } = require('../../libs/authToken');
 
 /*MONGOOSE SCHEMAS*/
-const User = require('../models/User');
+const User = require('../../models/User');
 
 /*Verify Token*/
 module.exports = async (req, res, next) => {

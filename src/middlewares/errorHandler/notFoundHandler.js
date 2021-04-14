@@ -7,7 +7,8 @@ function notFoundHandler(req,res){
     } = boom.notFound();
 
     res.status(statusCode).json({
-        payload
+        success:false,
+        message: payload.message
     });
 
 }
