@@ -21,8 +21,9 @@ const {
 
 const { ticketSchema, idTicketSchema } = require('../libs/schemas/ticket');
 
-const {
-    idCorporationSchema,
+const { 
+    idCorporationSchema, 
+    idDocumentSchema,
 } = require('../libs/schemas/corporation');
 
 
@@ -134,11 +135,13 @@ module.exports = () => {
 
     router.get('/corporation/:idCorporation/document',
         authAdmin,
+        validationHandler(Joi.object({ idCorporation: idCorporationSchema }), 'params'),
         corporationController.showAllCorporationDocuments
     );
 
     router.get('/corporation/document/:idDocument',
         authAdmin,
+        validationHandler(Joi.object({ idDocument: idDocumentSchema }), 'params'),
         corporationController.showDocument
     );
 
@@ -150,7 +153,8 @@ module.exports = () => {
 
     router.delete('/corporation/document/:idDocument',
         authAdmin,
-        corporationController.showDocument
+        validationHandler(Joi.object({ idDocument: idDocumentSchema }), 'params'),
+        corporationController.deleteDocument
     );
 
     /*CORPORATION CONTACT INFORMATIÓN*/
