@@ -6,33 +6,6 @@ const Status = require('../models/Status');
 /* LIBS */
 const { decodeToken } = require('../libs/authToken');
 
-exports.validateTicket = (req, res, next) => {
-
-    const { subject, description, corporation } = req.body;
-
-    if (!subject) {
-        return res.status(400).json({
-            success: false,
-            message: 'Debe añadir un asunto.'
-        });
-
-    } else if (!description) {
-        return res.status(400).json({
-            success: false,
-            message: 'Debe añadir una breve descripción.'
-        });
-
-    } else if (!corporation) {
-        return res.status(400).json({
-            success: false,
-            message: 'No ha elegido una empresa a la cual dirigir el ticket.'
-        });
-
-    }
-
-    next();
-}
-
 exports.showAllUserTickets = async (_, res) => {
 
     const { email } = decodeToken(res.locals.token);
@@ -49,7 +22,7 @@ exports.showAllUserTickets = async (_, res) => {
 
         const ticket = await Ticket.find(
             { user: user._id })
-            .populate('user').populate('corporation').populate('status');
+            .populate('corporation').populate('status');
 
         if (!ticket) {
             return res.status(401).json({
@@ -87,7 +60,6 @@ exports.showUserTicket = async (req, res) => {
         const ticket = await Ticket.findOne(
             {
                 _id: idTicket,
-                user: user._id
             }).populate('user').populate('corporation').populate('status');
 
         if (!ticket) {
@@ -119,7 +91,7 @@ exports.newTicket = async (req, res) => {
         description,
         corporation
     });
-    
+
     const { email } = decodeToken(res.locals.token);
 
     try {

@@ -15,7 +15,8 @@ const signupSchema = Joi.object({
     password: Joi.string().min(8).required().messages({
         'any.required': 'Debe ingresar una contraseña',
         'string.min': 'La contraseña debe tener minimo 8 caracteres',
-        'string.empty': 'La contraseña no puede ir vácia'
+        'string.empty': 'La contraseña no puede ir vácia',
+        'any.only': 'Las contraseñas no coinciden'
     }),
     confirmPassword: Joi.string().valid(Joi.ref('password')).required().messages({
         'any.required': 'Debe confirmar su contraseña',

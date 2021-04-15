@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const Joi = require('@hapi/joi');
 
-
 const authUser = require('../middlewares/authHandler/authUser');
 const authAdmin = require('../middlewares/authHandler/authAdmin');
 
@@ -18,6 +17,7 @@ const statusController = require('../controllers/statusController');
 /**VALIDATION SCHEMES */
 const { signupSchema,
     loginSchema } = require('../libs/schemas/authentication');
+const { ticketSchema, idTicketSchema } = require('../libs/schemas/ticket');
 
 const validationHandler = require('../middlewares/validationHandler');
 
@@ -64,12 +64,13 @@ module.exports = () => {
 
     router.get('/ticket/:idTicket',
         authUser,
+        validationHandler(Joi.object({ idTicket: idTicketSchema }), 'params'),
         ticketController.showUserTicket
     );
 
     router.post('/ticket/new',
         authUser,
-        ticketController.validateTicket,
+        validationHandler(ticketSchema),
         ticketController.newTicket
     );
 
@@ -81,7 +82,6 @@ module.exports = () => {
 
     router.post('/favorite/new',
         authUser,
-        favoriteController.validateFavorite,
         favoriteController.addFavorite
     );
 
