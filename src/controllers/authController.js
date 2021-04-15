@@ -11,54 +11,6 @@ const { hashPassword, comparePassword } = require('../libs/bcrypt');
 const { randomBytes } = require('crypto');
 
 /*      SIGNUP    */
-exports.validateSignup = async (req, res, next) => {
-
-    const { email, password, fullname, phone_number } = req.body;
-
-    if (!email) {
-        return res.status(400).json({
-            success: false,
-            message: 'Debe ingresar un email'
-        });
-
-    } else if (!validate.Email(email)) {
-        return res.status(400).json({
-            success: false,
-            message: 'Formato de Email no válido'
-        });
-
-    } else if (!password) {
-        return res.status(400).json({
-            success: false,
-            message: 'Debe ingresar una Password'
-        });
-
-    } else if (!validate.Password(password)) {
-        return res.status(400).json({
-            success: false,
-            message: 'La contraseña ingresada no tiene los parametros requeridos'
-        });
-    } else if (!fullname) {
-        return res.status(400).json({
-            success: false,
-            message: 'Debe ingresar su nombre'
-        });
-
-    } else if (!validate.Names(fullname)) {
-        return res.status(400).json({
-            success: false,
-            message: 'El nombre tiene caracteres no permitidos'
-        });
-
-    } else if (!phone_number) {
-        return res.status(400).json({
-            success: false,
-            message: 'Debe ingresar un numero teléfonico'
-        });
-    }
-    next();
-}
-
 exports.signUp = async (req, res) => {
 
     const { email, password, fullname, phone_number } = req.body;
@@ -126,37 +78,6 @@ exports.signUp = async (req, res) => {
 }
 
 /*      LOGIN       */
-exports.validateLogin = async (req, res, next) => {
-
-    const { email, password } = req.body;
-
-    if (!email) {
-        return res.status(400).json({
-            success: false,
-            message: 'Debe ingresar un email'
-        });
-
-    } else if (!validate.Email(email)) {
-        return res.status(400).json({
-            success: false,
-            message: 'Usuario o Contraseña Inválida'
-        });
-
-    } else if (!password) {
-        return res.status(400).json({
-            success: false,
-            message: 'Debe ingresar una Password'
-        });
-
-    } else if (!validate.Password(password)) {
-        return res.status(400).json({
-            success: false,
-            message: 'Usuario o Contraseña Inválida'
-        });
-    }
-
-    next();
-}
 
 exports.login = async (req, res) => {
 

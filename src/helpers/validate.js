@@ -1,4 +1,12 @@
-
+/**
+ * 
+ * 
+ * DEPRECATED 
+ *  WILL CHANGE TO JOI VALIDATION SCHEMES
+ * 
+ * 
+ * 
+ * */
 
 //default email comprobation.
 exports.Email= (email) =>{

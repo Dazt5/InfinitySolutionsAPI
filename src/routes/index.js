@@ -1,5 +1,8 @@
 const express = require('express');
 const router = express.Router();
+const Joi = require('@hapi/joi');
+
+
 const authUser = require('../middlewares/authHandler/authUser');
 const authAdmin = require('../middlewares/authHandler/authAdmin');
 
@@ -12,18 +15,24 @@ const favoriteController = require('../controllers/favoriteController');
 const corporationController = require('../controllers/corporationController');
 const statusController = require('../controllers/statusController');
 
+/**VALIDATION SCHEMES */
+const { signupSchema,
+    loginSchema } = require('../libs/schemas/authentication');
+
+const validationHandler = require('../middlewares/validationHandler');
+
 module.exports = () => {
 
     /*------- USER ROUTES ---------*/
 
     /*AUTHENTICATION*/
     router.post('/signup',
-        authController.validateSignup,
+        validationHandler(signupSchema),
         authController.signUp
     );
 
     router.post('/login',
-        authController.validateLogin,
+        validationHandler(loginSchema),
         authController.login
     );
 
@@ -150,7 +159,7 @@ module.exports = () => {
         corporationController.newContactInfo
     );
 
-     router.put('/corporation/contact/:idContact',
+    router.put('/corporation/contact/:idContact',
         authAdmin,
         corporationController.editContactInfo
     );

@@ -31,7 +31,7 @@ function errorHandler(err, req, res, next) {
     const { output: { statusCode, payload } } = err;
 
     res.status(statusCode);
-    res.json(withErrorStack(payload, err.stack));
+    res.json(withErrorStack(payload.message, err.stack));
 }
 
 module.exports = {
