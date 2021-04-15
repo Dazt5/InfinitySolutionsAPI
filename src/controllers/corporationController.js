@@ -7,7 +7,7 @@ const multer = require('multer');
 const shortid = require('shortid');
 
 const configurationUploadPicture = {
-    limits: {fileSize: 4096000},
+    limits: { fileSize: 4096000 },
     storage: fileStorage = multer.diskStorage({
         destination: (req, file, cb) => {
             cb(null, __dirname + '../../uploads/corporation/picture/')
@@ -19,7 +19,7 @@ const configurationUploadPicture = {
 
         }
     }),
-    fileFilter(req, file, cb) {   
+    fileFilter(req, file, cb) {
 
         const { name, rif } = req.body;
 
@@ -56,15 +56,6 @@ exports.uploadPicture = (req, res, next) => {
             });
         }
 
-        console.log(req.body);
-
-        if(!req.file){
-            return res.status(400).json({
-                success: false,
-                message: 'Debe subir una imagen de la corporación'
-            });
-        }
-
         return next();
     });
 }
@@ -82,9 +73,11 @@ exports.newCorporation = async (req, res) => {
     try {
 
         if (req.file) {
-            corporation.image = req.file.filename
+            corporation.image = req.file.filename;
+        } else {
+            corporation.image = 'default.png';
         }
-        
+
         await corporation.save();
 
         return res.status(200).json({
@@ -102,25 +95,43 @@ exports.newCorporation = async (req, res) => {
 }
 
 exports.editCorporation = async (req, res) => {
-    const { id } = req.params;
+
+    console.log(req.body);
+
+    const { idCorporation } = req.params;
+
+    const { name, rif } = req.body;
 
     try {
-        const corporation = await Corporation.findOneAndUpdate({ _id: id },
-            req.body,
-            {
-                new: true
-            });
+        const Previouscorporation = await Corporation.findOne({ _id: idCorporation });
 
-        /*TODO ADD EDIT IMAGE*/
-
-        if (!corporation) {
+        if (!Previouscorporation) {
             return res.status(404).json({
                 success: false,
                 message: 'La empresa ingresada no coincide con ninguna registrada'
             });
         }
 
-        res.status(200).json({
+        let newCorporation = { name, rif };
+
+        if (req.file) {
+
+            newCorporation.image = req.file.filename;
+
+        } else {
+
+            newCorporation.image = Previouscorporation.image;
+
+        }
+
+        await Corporation.findOneAndUpdate({ _id: idCorporation },
+            newCorporation,
+            {
+                new: true
+            });
+
+
+        res.status(201).json({
             success: true,
             message: 'Empresa actualizado correctamente.'
         });
@@ -133,14 +144,14 @@ exports.editCorporation = async (req, res) => {
     }
 }
 
-exports.deleteCompany = async (req, res) => {
+exports.deleteCorporation = async (req, res) => {
 
-    const { id } = req.params;
+    const { idCorporation } = req.params;
 
     try {
-        await Corporation.findOneAndDelete({ _id: id });
+        await Corporation.findOneAndDelete({ _id: idCorporation });
 
-        return res.status(200).json({
+        return res.status(201).json({
             success: true,
             message: 'Compañia Eliminada correctamente'
         });
@@ -182,11 +193,11 @@ exports.showAllCorporation = async (_, res) => {
 
 exports.showCorporation = async (req, res) => {
 
-    const { id } = req.params;
+    const { idCorporation } = req.params;
 
     try {
         const corporation = await Corporation.findOne({
-            _id: id
+            _id: idCorporation
         });
 
         if (!corporation) {

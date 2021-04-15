@@ -15,9 +15,17 @@ const corporationController = require('../controllers/corporationController');
 const statusController = require('../controllers/statusController');
 
 /**VALIDATION SCHEMES */
-const { signupSchema,
+const {
+    signupSchema,
     loginSchema } = require('../libs/schemas/authentication');
+
 const { ticketSchema, idTicketSchema } = require('../libs/schemas/ticket');
+
+const {
+    idCorporationSchema,
+} = require('../libs/schemas/corporation');
+
+
 
 const validationHandler = require('../middlewares/validationHandler');
 
@@ -95,8 +103,9 @@ module.exports = () => {
         authUser,
         corporationController.showAllCorporation);
 
-    router.get('/corporation/:id',
+    router.get('/corporation/:idCorporation',
         authUser,
+        validationHandler(Joi.object({ idCorporation: idCorporationSchema }), 'params'),
         corporationController.showCorporation);
 
     /*------- ADMIN ROUTES ---------*/
@@ -108,14 +117,17 @@ module.exports = () => {
         corporationController.newCorporation
     );
 
-    router.put('/corporation/:id',
+    router.put('/corporation/:idCorporation',
         authAdmin,
+        validationHandler(Joi.object({ idCorporation: idCorporationSchema }), 'params'),
+        corporationController.uploadPicture,
         corporationController.editCorporation
     );
 
-    router.delete('/corporation/:id',
+    router.delete('/corporation/:idCorporation',
         authAdmin,
-        corporationController.deleteCompany
+        validationHandler(Joi.object({ idCorporation: idCorporationSchema }), 'params'),
+        corporationController.deleteCorporation
     );
 
     /* CORPORATION DOCUMENTS */
