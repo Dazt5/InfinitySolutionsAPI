@@ -4,7 +4,6 @@ require('dotenv').config({ path: '.env' });
 const User = require('../models/User');
 
 /*  HELPERS AND LIBS    */
-const validate = require('../helpers/validate');
 const sendEmail = require('../libs/email');
 const { getToken } = require('../libs/authToken');
 const { hashPassword, comparePassword } = require('../libs/bcrypt');
