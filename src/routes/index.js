@@ -19,11 +19,15 @@ const {
     signupSchema,
     loginSchema } = require('../libs/schemas/authentication');
 
-const { ticketSchema, idTicketSchema } = require('../libs/schemas/ticket');
+const { ticketSchema,
+    idTicketSchema,
+} = require('../libs/schemas/ticket');
 
-const { 
-    idCorporationSchema, 
+const {
+    idCorporationSchema,
     idDocumentSchema,
+    idContactSchema,
+    contactSchema
 } = require('../libs/schemas/corporation');
 
 
@@ -161,27 +165,32 @@ module.exports = () => {
 
     router.get('/corporation/:idCorporation/contact',
         authAdmin,
+        validationHandler(Joi.object({ idCorporation: idCorporationSchema }), 'params'),
         corporationController.showAllContactInfo
     );
 
     router.get('/corporation/contact/:idContact',
         authAdmin,
+        validationHandler(Joi.object({ idContact: idContactSchema }), 'params'),
         corporationController.showContactInfo
     );
 
     router.post('/corporation/contact/new',
         authAdmin,
-        corporationController.validateContactInfo,
+        validationHandler(contactSchema),
         corporationController.newContactInfo
     );
 
     router.put('/corporation/contact/:idContact',
         authAdmin,
+        validationHandler(Joi.object({ idContact: idContactSchema }), 'params'),
+        validationHandler(contactSchema),
         corporationController.editContactInfo
     );
 
     router.delete('/corporation/contact/:idContact',
         authAdmin,
+        validationHandler(Joi.object({ idContact: idContactSchema }), 'params'),
         corporationController.deleteContactInfo
     );
 

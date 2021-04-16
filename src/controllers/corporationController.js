@@ -461,10 +461,12 @@ exports.showAllContactInfo = async (req, res) => {
 
 exports.showContactInfo = async (req, res) => {
 
+    const { idContact } = req.params;
+
     try {
 
         const contactCorporation = await Contact.findOne({
-            _id: id
+            _id: idContact
         })
 
         if (!contactCorporation) {
@@ -486,47 +488,6 @@ exports.showContactInfo = async (req, res) => {
             message: 'Ha ocurrido un error procesando la solicitud'
         });
     }
-}
-
-exports.validateContactInfo = (req, res, next) => {
-
-    const { station, country, state, city, address, id_corporation } = req.body;
-
-    if (!station) {
-        return res.status(400).json({
-            success: false,
-            message: 'Debe ingresar el nombre de la estación o establecimiento'
-        });
-    } else if (!country) {
-        return res.status(400).json({
-            success: false,
-            message: 'Debe ingresar un páis válido'
-        });
-    } else if (!state) {
-        return res.status(400).json({
-            success: false,
-            message: 'Debe seleccionar el estado donde se encuentra'
-        });
-    } else if (!city) {
-        return res.status(400).json({
-            success: false,
-            message: 'Debe seleccionar la ciudad donde se encuentra'
-        });
-    } else if (!address) {
-        return res.status(400).json({
-            success: false,
-            message: 'Debe proporcionar una dirección'
-        });
-    } else if (!id_corporation) {
-        return res.status(400).json({
-            success: false,
-            message: 'El ID de la empresa no es válido'
-        });
-    }
-
-    //TODO SANITIZING FIELDS
-
-    next();
 }
 
 /* COMPANY CONTACT INFO */
