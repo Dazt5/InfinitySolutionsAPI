@@ -19,7 +19,10 @@ const statusController = require('../controllers/statusController');
 const {
     signupSchema,
     loginSchema,
-    changePasswordSchema } = require('../libs/schemas/authentication');
+    recoverAccountSchema, } = require('../libs/schemas/authentication');
+
+
+const { changePasswordSchema } = require('../libs/schemas/user');
 
 const { ticketSchema,
     idTicketSchema,
@@ -68,6 +71,7 @@ module.exports = () => {
     );
 
     router.post('/recover/:token',
+        validationHandler(recoverAccountSchema),
         authController.recoverAccount
     );
 

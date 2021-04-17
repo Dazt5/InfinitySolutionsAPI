@@ -275,13 +275,6 @@ exports.recoverAccount = async (req, res) => {
 
     const { password } = req.body;
 
-    if (!validate.Password(password)) {
-        return res.status(400).json({
-            success: false,
-            message: 'La contraseña ingresada no tiene los parametros requeridos'
-        });
-    }
-
     try {
         const user = await User.findOne({
             recoveryToken: token,
@@ -309,6 +302,7 @@ exports.recoverAccount = async (req, res) => {
             message: 'La contraseña ha sido actualizada correctamente'
         });
     } catch (error) {
+        console.log(error);
         return res.status(500).json({
             success: false,
             message: 'Ha ocurrido un error inesperado'

@@ -41,8 +41,21 @@ const loginSchema = Joi.object({
     }),
 });
 
+const recoverAccountSchema = Joi.object({
+    password: Joi.string().min(8).required().messages({
+        'any.required': 'Debe ingresar una nueva contraseña',
+        'string.min': 'La contraseña debe tener minimo 8 caracteres',
+        'string.empty': 'La contraseña no puede ir vácia',
+    }),
+    confirmPassword: Joi.string().valid(Joi.ref('password')).required().messages({
+        'any.required': 'Debe confirmar su contraseña',
+        'string.empty': 'Debe confirmar su contraseña',
+        'any.only': 'Las contraseñas no coinciden'
+    }),
+});
 
 module.exports = {
     signupSchema,
-    loginSchema
+    loginSchema,
+    recoverAccountSchema
 }
