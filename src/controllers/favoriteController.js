@@ -6,27 +6,6 @@ const User = require('../models/User');
 /* LIBS */
 const { decodeToken } = require('../libs/authToken');
 
-exports.validateFavorite = (req, res, next) => {
-
-    const { corporation, user_id } = req.body;
-
-    if (!corporation || !mongoose.Types.ObjectId(corporation)) {
-
-        return res.status(400).json({
-            success: false,
-            message: 'ID de la empresa inválido'
-        });
-
-    } else if (!user_id || !mongoose.Types.ObjectId(user)) {
-
-        return res.status(400).json({
-            success: false,
-            message: 'ID del usuario inválido'
-        });
-    }
-    next();
-}
-
 exports.showFavorite = async (_, res) => {
 
     const { email } = decodeToken(res.locals.token);

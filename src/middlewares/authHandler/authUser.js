@@ -1,9 +1,7 @@
-require('dotenv').config({ path: '.env' });
-
-const { decodeToken, verifyToken } = require('../libs/authToken');
+const { decodeToken, verifyToken } = require('../../libs/authToken');
 
 /*MONGOOSE SCHEMAS*/
-const User = require('../models/User');
+const User = require('../../models/User');
 
 
 module.exports = async (req, res, next) => {
@@ -30,7 +28,7 @@ module.exports = async (req, res, next) => {
     } catch (error) {
         console.log(error);
         if (error.name === 'TokenExpiredError') {
-            return res.status(400).json({
+            return res.status(401).json({
                 success: false,
                 message: 'Su sesión ha expirado, vuelva a iniciar sesión'
             });
@@ -54,7 +52,7 @@ module.exports = async (req, res, next) => {
 
     if (!user) {
 
-        return res.status(403).json({
+        return res.status(401).json({
             success: false,
             message: 'La cuenta no está activada'
         });

@@ -6,33 +6,6 @@ const Status = require('../models/Status');
 /* LIBS */
 const { decodeToken } = require('../libs/authToken');
 
-exports.validateTicket = (req, res, next) => {
-
-    const { subject, description, corporation } = req.body;
-
-    if (!subject) {
-        return res.status(400).json({
-            success: false,
-            message: 'Debe añadir un asunto.'
-        });
-
-    } else if (!description) {
-        return res.status(400).json({
-            success: false,
-            message: 'Debe añadir una breve descripción.'
-        });
-
-    } else if (!corporation) {
-        return res.status(400).json({
-            success: false,
-            message: 'No ha elegido una empresa a la cual dirigir el ticket.'
-        });
-
-    }
-
-    next();
-}
-
 exports.showAllUserTickets = async (_, res) => {
 
     const { email } = decodeToken(res.locals.token);
@@ -41,15 +14,15 @@ exports.showAllUserTickets = async (_, res) => {
         const user = await User.findOne({ email });
 
         if (!user) {
-            return res.status(401).json({
+            return res.status(404).json({
                 success: false,
-                message: 'No se ha podido procesar la solicitud'
+                message: 'El usuario no existe'
             });
         }
 
         const ticket = await Ticket.find(
             { user: user._id })
-            .populate('user').populate('corporation').populate('status');
+            .populate('corporation').populate('status');
 
         if (!ticket) {
             return res.status(401).json({
@@ -71,7 +44,7 @@ exports.showAllUserTickets = async (_, res) => {
 }
 
 exports.showUserTicket = async (req, res) => {
-    const { id } = req.params;
+    const { idTicket } = req.params;
     const { email } = decodeToken(res.locals.token);
 
     try {
@@ -86,8 +59,7 @@ exports.showUserTicket = async (req, res) => {
 
         const ticket = await Ticket.findOne(
             {
-                _id: id,
-                user: user._id
+                _id: idTicket,
             }).populate('user').populate('corporation').populate('status');
 
         if (!ticket) {
@@ -112,7 +84,14 @@ exports.showUserTicket = async (req, res) => {
 
 exports.newTicket = async (req, res) => {
 
-    const ticket = await Ticket(req.body);
+    const { subject, description, corporation } = req.body;
+
+    const ticket = await Ticket({
+        subject,
+        description,
+        corporation
+    });
+
     const { email } = decodeToken(res.locals.token);
 
     try {

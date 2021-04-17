@@ -45,7 +45,7 @@ JSON post ContactInfo
        "state":"Zulia",
        "city":"Maracaibo",
        "address":"Pomona, Avenida 45.",
-       "emails":[ //optional
+       "emails":[ 
             {
             "department": "Consultoría",
             "email": "consuloria@email.com"
@@ -55,7 +55,7 @@ JSON post ContactInfo
             "email": "administración@email.com"
             }
        ],
-       "phone_numbers":[ //optional
+       "phone_numbers":[ 
             {
             "department": "Consultoría",
             "phone_number": "+58 414-4444444"
@@ -65,6 +65,6 @@ JSON post ContactInfo
             "phone_number": "+58 412-5555555"
             }
        ],
-       "id_corporation": "_id Corporation" //if is put, remove this line
+       "id_corporation": "_id Corporation" //if the request is put, remove this line
 }
 */

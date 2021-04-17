@@ -5,6 +5,10 @@
 /.pnp
 .pnp.js
 
+# uploads
+src/uploads/corporation/picture/*
+src/uploads/corporation/document/*
+src/uploads/user/picture/*
 
 # testing
 /coverage

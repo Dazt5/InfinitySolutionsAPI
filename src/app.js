@@ -1,16 +1,19 @@
-/*MONGODB*/ 
+/*MONGODB*/
 require('./config/db');
-/*DEFAULT USER MIDDLEWARE*/ 
+/*MIDDLEWARES*/
 require('./middlewares/createDefaultAdmin');
+
+const notFoundHandler = require('./middlewares/errorHandler/notFoundHandler');
 
 /*IMPORTS */
 const express = require('express');
-require('dotenv').config({ path: '.env' });
 const cors = require('cors');
 const helmet = require('helmet');
+const { config } = require('./config/index');
 
 /*- Import router -*/
 const router = require('./routes/index');
+const { logErrors, wrapErrors, errorHandler } = require('./middlewares/errorHandler/errorHandler');
 
 const app = express();
 
@@ -21,15 +24,21 @@ app.use(cors());
 app.use(helmet());
 
 /*public folders*/
-app.use(express.static('./uploads'));
+app.use(express.static('./src/uploads'));
 
 /*ROUTES*/
 app.use(router());
 
-/*SERVER*/
-const port = process.env.PORT || 5001;
+//ERROR MIDDLEWARES
+app.use(notFoundHandler);
 
-const host = process.env.HOST || '127.0.0.1';
+app.use(logErrors);
+app.use(wrapErrors);
+app.use(errorHandler);
+
+/*SERVER*/
+const port = config.port || 5001;
+const host = config.host || '127.0.0.1';
 
 app.listen(port, host, () => {
 
