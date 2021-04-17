@@ -20,8 +20,6 @@ exports.signUp = async (req, res) => {
             email
         });
 
-        console.log(userExist);
-
         if (userExist) {
             return res.status(400).json({
                 success: false,
@@ -153,7 +151,6 @@ exports.sendActivatedToken = async (req, res) => {
         });
 
     } catch (error) {
-        console.log(error);
         return res.status(500).json({
             success: false,
             message: 'Ha ocurrido un error inesperado'
@@ -233,7 +230,6 @@ exports.sendRecoverToken = async (req, res) => {
             message: 'Se ha envíado el correo de recuperación'
         });
     } catch (error) {
-        console.log(error);
         return res.status(500).json({
             success: false,
             message: 'Ha ocurrido un error inesperado'
@@ -266,7 +262,6 @@ exports.validateRecoveryToken = async (req, res) => {
         });
 
     } catch (error) {
-        console.log(error);
         return res.status(500).json({
             success: false,
             message: 'Ha ocurrido un error inesperado'
@@ -314,7 +309,6 @@ exports.recoverAccount = async (req, res) => {
             message: 'La contraseña ha sido actualizada correctamente'
         });
     } catch (error) {
-        console.log(error);
         return res.status(500).json({
             success: false,
             message: 'Ha ocurrido un error inesperado'
