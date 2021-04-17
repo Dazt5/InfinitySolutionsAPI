@@ -48,30 +48,32 @@ exports.showFavorite = async (_, res) => {
 exports.addFavorite = async (req, res) => {
 
     const { email } = decodeToken(res.locals.token);
-    const { user_id, corporation } = req.body;
+    const { idCorporation } = req.body;
 
     const user = await User.findOne(
         {
             email,
-            _id: user_id
         });
 
     if (!user) {
         return res.status(404).json({
             success: false,
-            message: 'Sus credenciales no coinciden con un usuario registrado'
+            message: 'El usuario al que está haciendo referencia no se encuentra.'
         });
     }
+
+    const idUser = user._id;
+
     const favorite = Favorite(
         {
-            user: user_id,
-            corporation
+            corporation: idCorporation,
+            user: idUser,
         });
 
     try {
         await favorite.save();
 
-        return res.status(200).json({
+        return res.status(201).json({
             success: true,
             message: 'Favorito Agregado'
         });
@@ -86,8 +88,7 @@ exports.addFavorite = async (req, res) => {
 
 exports.deleteFavorite = async (req, res) => {
 
-    const { email } = decodeToken(res.locals.token);
-    const { id } = req.params;
+    const { idFavorite } = req.params;
 
     try {
         const user = await User.findOne(
@@ -103,8 +104,7 @@ exports.deleteFavorite = async (req, res) => {
         }
 
         await Favorite.findOneAndDelete({
-            _id: id,
-            user: user.id,
+            _id: idFavorite,
         });
 
         res.status(200).json({

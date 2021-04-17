@@ -14,6 +14,12 @@ const idDocumentSchema = Joi.string().regex(mongoId).required().messages({
     'string.pattern.base': 'El id del documento es inválido.'
 });
 
+const idFavoriteSchema = Joi.string().regex(mongoId).required().messages({
+    'any.required': 'No existe un favorito al que se haga referencia',
+    'string.empty': 'No se ha proporcionado el id del favorito',
+    'string.pattern.base': 'el id del favorito es inválido.'
+});
+
 const idContactSchema = Joi.string().regex(mongoId).required().messages({
     'any.required': 'No se ha proporcionado el id de la información de contacto.',
     'string.empty': 'No se ha proporcionado el id de la información de contacto.',
@@ -92,6 +98,7 @@ const contactSchema = Joi.object({
 module.exports = {
     idCorporationSchema,
     idDocumentSchema,
+    idFavoriteSchema,
     idContactSchema,
     contactSchema
 };

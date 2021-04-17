@@ -33,6 +33,7 @@ const {
 const {
     idCorporationSchema,
     idDocumentSchema,
+    idFavoriteSchema,
     idContactSchema,
     contactSchema } = require('../libs/schemas/corporation');
 
@@ -114,11 +115,13 @@ module.exports = () => {
 
     router.post('/favorite/new',
         authUser,
+        validationHandler(Joi.object({ idCorporation: idCorporationSchema })),
         favoriteController.addFavorite
     );
 
-    router.delete('/favorite/:id',
+    router.delete('/favorite/:idFavorite',
         authUser,
+        validationHandler(Joi.object({ idFavorite: idFavoriteSchema }), 'params'),
         favoriteController.deleteFavorite
     );
 
