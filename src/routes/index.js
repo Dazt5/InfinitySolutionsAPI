@@ -22,21 +22,21 @@ const {
     recoverAccountSchema, } = require('../libs/schemas/authentication');
 
 
-const { changePasswordSchema } = require('../libs/schemas/user');
+const {
+    changePasswordSchema,
+    changeProfileSchema } = require('../libs/schemas/user');
 
-const { ticketSchema,
-    idTicketSchema,
-} = require('../libs/schemas/ticket');
+const {
+    ticketSchema,
+    idTicketSchema, } = require('../libs/schemas/ticket');
 
 const {
     idCorporationSchema,
     idDocumentSchema,
     idContactSchema,
-    contactSchema
-} = require('../libs/schemas/corporation');
+    contactSchema } = require('../libs/schemas/corporation');
 
-
-
+/**VALIDATION HANDLER*/
 const validationHandler = require('../middlewares/validationHandler');
 
 module.exports = () => {
@@ -80,6 +80,12 @@ module.exports = () => {
         authUser,
         validationHandler(changePasswordSchema),
         userController.changePassword
+    );
+
+    router.patch('/change/profile',
+        authUser,
+        validationHandler(changeProfileSchema),
+        userController.changeProfile
     );
 
     /*TICKETS*/

@@ -55,3 +55,34 @@ exports.changePassword = async (req, res) => {
     }
 
 }
+
+exports.changeProfile = async (req, res) => {
+
+    const { fullname, phone_number } = req.body;
+    const { email } = decodeToken(res.locals.token);
+
+    try {
+
+        await User.findOneAndUpdate(
+            {
+                email
+            },
+            {
+                fullname,
+                phone_number
+            });
+
+        return res.status(201).json({
+            success: true,
+            message: "Información actualizada correctamente"
+        });
+
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            success: false,
+            message: "Ha ocurrido un error inesperado..."
+        });
+    }
+
+}

@@ -19,8 +19,22 @@ const changePasswordSchema = Joi.object({
         'string.empty': 'Debe confirmar su nueva contraseña',
         'any.only': 'Las contraseñas no coinciden'
     }),
-})
+});
+
+const changeProfileSchema = Joi.object({
+
+    fullname: Joi.string().required().regex(/^[a-zA-Z]{3,35}(?: [a-zA-Z]+){0,3}$/).messages({
+        'any.required': 'Debe ingresar su nombre y apellido',
+        'string.empty': 'Su nombre completo no puede ir vácio',
+        'string.pattern.base': 'Su nombre completo no debe contener números ni mas de un espacio entre si'
+    }),
+    phone_number: Joi.string().required().messages({
+        'any.required': 'Debe ingresar un número teléfonico',
+        'string.empty': 'El número teléfonico no puede ir vácio',
+    }),
+});
 
 module.exports = {
-    changePasswordSchema
+    changePasswordSchema,
+    changeProfileSchema
 }
