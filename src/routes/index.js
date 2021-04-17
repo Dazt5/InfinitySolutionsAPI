@@ -9,6 +9,7 @@ const authAdmin = require('../middlewares/authHandler/authAdmin');
 const authController = require('../controllers/authController');
 const ticketController = require('../controllers/ticketController');
 const favoriteController = require('../controllers/favoriteController');
+const userController = require('../controllers/userController');
 
 /*ADMINS CONTROLLERS*/
 const corporationController = require('../controllers/corporationController');
@@ -17,7 +18,8 @@ const statusController = require('../controllers/statusController');
 /**VALIDATION SCHEMES */
 const {
     signupSchema,
-    loginSchema } = require('../libs/schemas/authentication');
+    loginSchema,
+    changePasswordSchema } = require('../libs/schemas/authentication');
 
 const { ticketSchema,
     idTicketSchema,
@@ -67,6 +69,13 @@ module.exports = () => {
 
     router.post('/recover/:token',
         authController.recoverAccount
+    );
+
+    /*USER*/
+    router.post('/change/password',
+        authUser,
+        validationHandler(changePasswordSchema),
+        userController.changePassword
     );
 
     /*TICKETS*/

@@ -1,8 +1,56 @@
 const User = require('../models/User');
 
+const { decodeToken } = require('../libs/authToken');
+const { hashPassword, comparePassword } = require('../libs/bcrypt');
 
-const changePassword = (req,res) =>{
+exports.changePassword = async (req, res) => {
 
-    
+    const { newPassword,password } = req.body;
+    const { email } = decodeToken(res.locals.token);
+
+    try {
+
+        const user = await User.findOne({
+            email
+        });
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "El usuario ya no está disponible."
+            });
+        }
+
+        const lastPassword = user.password;
+
+        if(!comparePassword(password, lastPassword)){
+            return res.status(401).json({
+                success:false,
+                message: "La contraseña ingresada es incorrecta."
+            }) 
+        }
+
+        const hashedPassword = await hashPassword(newPassword);
+
+        await User.findOneAndUpdate(
+            {
+                email
+            },
+            {
+                password: hashedPassword
+            });
+
+        return res.status(201).json({
+            success: true,
+            message: "Su password ha sido actualizada correctamente."
+        });
+
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            success: false,
+            message: "Ha ocurrido un error inesperado..."
+        });
+    }
 
 }
