@@ -5,7 +5,7 @@ const { hashPassword, comparePassword } = require('../libs/bcrypt');
 
 exports.changePassword = async (req, res) => {
 
-    const { newPassword,password } = req.body;
+    const { newPassword, password } = req.body;
     const { email } = decodeToken(res.locals.token);
 
     try {
@@ -22,12 +22,13 @@ exports.changePassword = async (req, res) => {
         }
 
         const lastPassword = user.password;
+        const validatePassword = await comparePassword(password, lastPassword);
 
-        if(!comparePassword(password, lastPassword)){
+        if (!validatePassword) {
             return res.status(401).json({
-                success:false,
+                success: false,
                 message: "La contraseña ingresada es incorrecta."
-            }) 
+            });
         }
 
         const hashedPassword = await hashPassword(newPassword);
