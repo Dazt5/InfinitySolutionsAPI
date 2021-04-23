@@ -1,5 +1,19 @@
 const Joi = require('@hapi/joi');
 
+const mongoId = /^[0-9a-fA-F]{24}$/;
+
+const userEmailSchema = Joi.string().email().required().messages({
+    'any.required': 'Debe ingresar un email',
+    'string.email': 'El email que ha ingresado no es válido',
+    'string.empty': 'El email no puede ir vácio'
+});
+
+const idUserSchema = Joi.string().regex(mongoId).required().messages({
+    'any.required': 'No se ha proporcionado el id del usuario.',
+    'string.empty': 'No se ha proporcionado el id del usuario.',
+    'string.pattern.base': 'El id del usuario es inválido.'
+});
+
 const changePasswordSchema = Joi.object({
 
     password: Joi.string().min(8).required().messages({
@@ -35,6 +49,8 @@ const changeProfileSchema = Joi.object({
 });
 
 module.exports = {
+    userEmailSchema,
+    idUserSchema,
     changePasswordSchema,
     changeProfileSchema
 }

@@ -23,6 +23,8 @@ const {
 
 
 const {
+    userEmailSchema,
+    idUserSchema,
     changePasswordSchema,
     changeProfileSchema } = require('../libs/schemas/user');
 
@@ -143,13 +145,15 @@ module.exports = () => {
 
     /*------- ADMIN ROUTES ---------*/
 
-    router.get('/user/:userId',
+    router.get('/user/profile/:userId',
         authAdmin,
+        validationHandler(Joi.object({ userId: idUserSchema }), 'params'),
         userController.getUserById
     );
 
-    router.get('/user/:email',
+    router.get('/user/search/:email',
         authAdmin,
+        validationHandler(Joi.object({ email: userEmailSchema }), 'params'),
         userController.getUserByEmail
     );
 
