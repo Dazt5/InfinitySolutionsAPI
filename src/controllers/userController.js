@@ -86,3 +86,93 @@ exports.changeProfile = async (req, res) => {
     }
 
 }
+
+exports.getUser = async (req, res) => {
+
+    const { email } = decodeToken(res.locals.token);
+
+    try {
+
+        const user = await User.findOne({
+            email
+        });
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "El usuario ya no se encuentra disponible"
+            })
+        }
+
+        return res.status(200).json({
+            success: true,
+            user
+        });
+
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({
+            success: false,
+            message: "Ha ocurrido un error inesperado..."
+        });
+    }
+
+}
+
+exports.getUserById = async (req, res) => {
+    const { userId } = req.params;
+
+    try {
+        const user = await User.findOne({
+            _id: userId
+        });
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "El usuario no existe"
+            })
+        }
+
+        return res.status(200).json({
+            success: true,
+            user
+        });
+
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({
+            success: false,
+            message: "Ha ocurrido un error inesperado..."
+        });
+    }
+}
+
+exports.getUserByEmail = async (req, res) => {
+    const { email } = req.params;
+
+    try {
+        const user = await User.findOne({
+            email
+        });
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "El usuario no existe"
+            })
+        }
+
+        return res.status(200).json({
+            success: true,
+            user
+        });
+
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({
+            success: false,
+            message: "Ha ocurrido un error inesperado..."
+        });
+    }
+}

@@ -77,6 +77,12 @@ module.exports = () => {
     );
 
     /*USER*/
+
+    router.get('/user',
+        authUser,
+        userController.getUser
+    );
+
     router.post('/change/password',
         authUser,
         validationHandler(changePasswordSchema),
@@ -136,6 +142,16 @@ module.exports = () => {
         corporationController.showCorporation);
 
     /*------- ADMIN ROUTES ---------*/
+
+    router.get('/user/:userId',
+        authAdmin,
+        userController.getUserById
+    );
+
+    router.get('/user/:email',
+        authAdmin,
+        userController.getUserByEmail
+    );
 
     //* CORPORATION */
     router.post('/corporation/new',
