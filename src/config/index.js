@@ -12,7 +12,11 @@ const config = {
     dbHost: process.env.DB_HOST,
     dbName: process.env.DB_NAME,
     dbLocal: process.env.NODE_ENV === 'development' ? process.env.DB_LOCAL : false,
-    dbLocalName:process.env.NODE_ENV === 'development' ? process.env.DB_LOCAL_NAME : false
+
+    emailUser: process.env.EMAIL_USER,
+    emailPassword: process.env.EMAIL_PASSWORD,
+    emailHost: process.env.EMAIL_HOST,
+    emailPort: process.env.EMAIL_PORT,
 }
 
 module.exports = {config}
