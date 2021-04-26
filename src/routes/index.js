@@ -13,31 +13,41 @@ const userController = require('../controllers/userController');
 
 /*ADMINS CONTROLLERS*/
 const corporationController = require('../controllers/corporationController');
+const faqController = require('../controllers/faqController');
 const statusController = require('../controllers/statusController');
 
 /**VALIDATION SCHEMES */
 const {
     signupSchema,
     loginSchema,
-    recoverAccountSchema, } = require('../libs/schemas/authentication');
+    recoverAccountSchema,
+} = require('../libs/schemas/authentication');
 
 
 const {
     userEmailSchema,
     idUserSchema,
     changePasswordSchema,
-    changeProfileSchema } = require('../libs/schemas/user');
+    changeProfileSchema
+} = require('../libs/schemas/user');
 
 const {
     ticketSchema,
-    idTicketSchema, } = require('../libs/schemas/ticket');
+    idTicketSchema,
+} = require('../libs/schemas/ticket');
 
 const {
     idCorporationSchema,
     idDocumentSchema,
     idFavoriteSchema,
     idContactSchema,
-    contactSchema } = require('../libs/schemas/corporation');
+    contactSchema
+} = require('../libs/schemas/corporation');
+
+const {
+    idFaqSchema,
+    faqSchema
+} = require('../libs/schemas/faq')
 
 /**VALIDATION HANDLER*/
 const validationHandler = require('../middlewares/validationHandler');
@@ -143,6 +153,12 @@ module.exports = () => {
         validationHandler(Joi.object({ idCorporation: idCorporationSchema }), 'params'),
         corporationController.showCorporation);
 
+    router.get('/corporation/:idCorporation/FAQ',
+        authUser,
+        validationHandler(Joi.object({ idCorporation: idCorporationSchema }), 'params'),
+        faqController.getFaqs
+    )
+
     /*------- ADMIN ROUTES ---------*/
 
     router.get('/user/profile/:userId',
@@ -235,6 +251,35 @@ module.exports = () => {
         validationHandler(Joi.object({ idContact: idContactSchema }), 'params'),
         corporationController.deleteContactInfo
     );
+
+    //CORPORATION FAQ
+
+    router.get('/corporation/FAQ/:idFaq',
+        authUser,
+        validationHandler(Joi.object({ idFaq: idFaqSchema }), 'params'),
+        faqController.getOneFaq
+    );
+
+    router.post('/corporation/:idCorporation/FAQ',
+        authAdmin,
+        validationHandler(Joi.object({ idCorporation: idCorporationSchema }), 'params'),
+        validationHandler(faqSchema),
+        faqController.newFaq,
+    );
+
+    router.put('/corporation/FAQ/:idFaq',
+        authAdmin,
+        validationHandler(Joi.object({ idFaq: idFaqSchema }), 'params'),
+        validationHandler(faqSchema),
+        faqController.editFaq
+    );
+
+    router.delete('/corporation/FAQ/:idFaq',
+        authAdmin,
+        validationHandler(Joi.object({ idFaq: idFaqSchema }), 'params'),
+        faqController.deleteFaq
+    );
+
 
     /*STATUS*/
 
