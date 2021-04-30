@@ -9,29 +9,48 @@ const authAdmin = require('../middlewares/authHandler/authAdmin');
 const authController = require('../controllers/authController');
 const ticketController = require('../controllers/ticketController');
 const favoriteController = require('../controllers/favoriteController');
+const userController = require('../controllers/userController');
 
 /*ADMINS CONTROLLERS*/
 const corporationController = require('../controllers/corporationController');
+const faqController = require('../controllers/faqController');
 const statusController = require('../controllers/statusController');
+const documentController = require('../controllers/documentController');
 
 /**VALIDATION SCHEMES */
 const {
     signupSchema,
-    loginSchema } = require('../libs/schemas/authentication');
+    loginSchema,
+    recoverAccountSchema,
+} = require('../libs/schemas/authentication');
 
-const { ticketSchema,
+
+const {
+    userEmailSchema,
+    idUserSchema,
+    changePasswordSchema,
+    changeProfileSchema
+} = require('../libs/schemas/user');
+
+const {
+    ticketSchema,
     idTicketSchema,
 } = require('../libs/schemas/ticket');
 
 const {
     idCorporationSchema,
     idDocumentSchema,
+    idFavoriteSchema,
     idContactSchema,
     contactSchema
 } = require('../libs/schemas/corporation');
 
+const {
+    idFaqSchema,
+    faqSchema
+} = require('../libs/schemas/faq')
 
-
+/**VALIDATION HANDLER*/
 const validationHandler = require('../middlewares/validationHandler');
 
 module.exports = () => {
@@ -66,7 +85,27 @@ module.exports = () => {
     );
 
     router.post('/recover/:token',
+        validationHandler(recoverAccountSchema),
         authController.recoverAccount
+    );
+
+    /*USER*/
+
+    router.get('/user',
+        authUser,
+        userController.getUser
+    );
+
+    router.post('/change/password',
+        authUser,
+        validationHandler(changePasswordSchema),
+        userController.changePassword
+    );
+
+    router.patch('/change/profile',
+        authUser,
+        validationHandler(changeProfileSchema),
+        userController.changeProfile
     );
 
     /*TICKETS*/
@@ -95,11 +134,13 @@ module.exports = () => {
 
     router.post('/favorite/new',
         authUser,
+        validationHandler(Joi.object({ idCorporation: idCorporationSchema })),
         favoriteController.addFavorite
     );
 
-    router.delete('/favorite/:id',
+    router.delete('/favorite/:idFavorite',
         authUser,
+        validationHandler(Joi.object({ idFavorite: idFavoriteSchema }), 'params'),
         favoriteController.deleteFavorite
     );
 
@@ -113,7 +154,25 @@ module.exports = () => {
         validationHandler(Joi.object({ idCorporation: idCorporationSchema }), 'params'),
         corporationController.showCorporation);
 
+    router.get('/corporation/:idCorporation/FAQ',
+        authUser,
+        validationHandler(Joi.object({ idCorporation: idCorporationSchema }), 'params'),
+        faqController.getFaqs
+    )
+
     /*------- ADMIN ROUTES ---------*/
+
+    router.get('/user/profile/:userId',
+        authAdmin,
+        validationHandler(Joi.object({ userId: idUserSchema }), 'params'),
+        userController.getUserById
+    );
+
+    router.get('/user/search/:email',
+        authAdmin,
+        validationHandler(Joi.object({ email: userEmailSchema }), 'params'),
+        userController.getUserByEmail
+    );
 
     //* CORPORATION */
     router.post('/corporation/new',
@@ -140,25 +199,32 @@ module.exports = () => {
     router.get('/corporation/:idCorporation/document',
         authAdmin,
         validationHandler(Joi.object({ idCorporation: idCorporationSchema }), 'params'),
-        corporationController.showAllCorporationDocuments
+        documentController.showDocuments
     );
 
     router.get('/corporation/document/:idDocument',
         authAdmin,
         validationHandler(Joi.object({ idDocument: idDocumentSchema }), 'params'),
-        corporationController.showDocument
+        documentController.showDocument
     );
 
     router.post('/corporation/document/new',
         authAdmin,
-        corporationController.uploadDocument,
-        corporationController.newCorporationDocument
+        documentController.uploadDocument,
+        documentController.newDocument
     );
 
     router.delete('/corporation/document/:idDocument',
         authAdmin,
         validationHandler(Joi.object({ idDocument: idDocumentSchema }), 'params'),
-        corporationController.deleteDocument
+        documentController.deleteDocument
+    );
+
+    /*DOWNLOAD DOCUMENT*/
+
+    router.get('/document/:file',
+        authAdmin,
+        documentController.sendDocument
     );
 
     /*CORPORATION CONTACT INFORMATIÓN*/
@@ -193,6 +259,35 @@ module.exports = () => {
         validationHandler(Joi.object({ idContact: idContactSchema }), 'params'),
         corporationController.deleteContactInfo
     );
+
+    //CORPORATION FAQ
+
+    router.get('/corporation/FAQ/:idFaq',
+        authUser,
+        validationHandler(Joi.object({ idFaq: idFaqSchema }), 'params'),
+        faqController.getOneFaq
+    );
+
+    router.post('/corporation/:idCorporation/FAQ',
+        authAdmin,
+        validationHandler(Joi.object({ idCorporation: idCorporationSchema }), 'params'),
+        validationHandler(faqSchema),
+        faqController.newFaq,
+    );
+
+    router.put('/corporation/FAQ/:idFaq',
+        authAdmin,
+        validationHandler(Joi.object({ idFaq: idFaqSchema }), 'params'),
+        validationHandler(faqSchema),
+        faqController.editFaq
+    );
+
+    router.delete('/corporation/FAQ/:idFaq',
+        authAdmin,
+        validationHandler(Joi.object({ idFaq: idFaqSchema }), 'params'),
+        faqController.deleteFaq
+    );
+
 
     /*STATUS*/
 

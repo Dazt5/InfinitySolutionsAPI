@@ -6,9 +6,9 @@
 .pnp.js
 
 # uploads
-src/uploads/corporation/picture/*
-src/uploads/corporation/document/*
-src/uploads/user/picture/*
+src/uploads/
+src/documents/
+
 
 # testing
 /coverage

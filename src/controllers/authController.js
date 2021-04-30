@@ -14,14 +14,26 @@ exports.signUp = async (req, res) => {
 
     const { email, password, fullname, phone_number } = req.body;
 
-    const user = new User({
-        email,
-        password,
-        fullname,
-        phone_number
-    });
-
     try {
+
+        const userExist = await User.findOne({
+            email
+        });
+
+        if (userExist) {
+            return res.status(400).json({
+                success: false,
+                message: 'El email ingresado ya se encuentra registrado'
+            });
+        }
+
+        const user = new User({
+            email,
+            password,
+            fullname,
+            phone_number
+        });
+
         const hashedPassword = await hashPassword(user.password);
 
         user.password = hashedPassword;
@@ -44,35 +56,10 @@ exports.signUp = async (req, res) => {
         });
 
     } catch (error) {
-
-        if (error.name === 'MongoError') {
-
-            //Code for duplicate key in Mongoose
-            if (error.code === 11000) {
-
-                var duplicateKey;
-
-                for (var field in error.keyPattern) {
-                    if (error.keyPattern.hasOwnProperty(field)) {
-                        duplicateKey += ' ' + field
-                    }//find duplicate key
-                }
-                return res.status(400).json({
-                    success: false,
-                    message: ` ${duplicateKey} Ya se encuentra registrado`
-                });
-            } else {
-                return res.status(500).json({
-                    success: false,
-                    message: 'Ha ocurrido un error inesperado.'
-                });
-            }
-        } else {
-            return res.status(500).json({
-                success: false,
-                message: 'Ha ocurrido un error inesperado'
-            });
-        }
+        return res.status(500).json({
+            success: false,
+            message: 'Ha ocurrido un error inesperado'
+        });
     }
 }
 
@@ -164,7 +151,6 @@ exports.sendActivatedToken = async (req, res) => {
         });
 
     } catch (error) {
-        console.log(error);
         return res.status(500).json({
             success: false,
             message: 'Ha ocurrido un error inesperado'
@@ -244,7 +230,6 @@ exports.sendRecoverToken = async (req, res) => {
             message: 'Se ha envíado el correo de recuperación'
         });
     } catch (error) {
-        console.log(error);
         return res.status(500).json({
             success: false,
             message: 'Ha ocurrido un error inesperado'
@@ -275,9 +260,8 @@ exports.validateRecoveryToken = async (req, res) => {
             success: true,
             message: 'Ingresa la nueva contraseña'
         });
-        
+
     } catch (error) {
-        console.log(error);
         return res.status(500).json({
             success: false,
             message: 'Ha ocurrido un error inesperado'
@@ -290,13 +274,6 @@ exports.recoverAccount = async (req, res) => {
     const { token } = req.params;
 
     const { password } = req.body;
-
-    if (!validate.Password(password)) {
-        return res.status(400).json({
-            success: false,
-            message: 'La contraseña ingresada no tiene los parametros requeridos'
-        });
-    }
 
     try {
         const user = await User.findOne({
@@ -331,5 +308,4 @@ exports.recoverAccount = async (req, res) => {
             message: 'Ha ocurrido un error inesperado'
         });
     }
-
 }
