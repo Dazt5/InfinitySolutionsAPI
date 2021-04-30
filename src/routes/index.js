@@ -15,6 +15,7 @@ const userController = require('../controllers/userController');
 const corporationController = require('../controllers/corporationController');
 const faqController = require('../controllers/faqController');
 const statusController = require('../controllers/statusController');
+const documentController = require('../controllers/documentController');
 
 /**VALIDATION SCHEMES */
 const {
@@ -198,32 +199,32 @@ module.exports = () => {
     router.get('/corporation/:idCorporation/document',
         authAdmin,
         validationHandler(Joi.object({ idCorporation: idCorporationSchema }), 'params'),
-        corporationController.showAllCorporationDocuments
+        documentController.showDocuments
     );
 
     router.get('/corporation/document/:idDocument',
         authAdmin,
         validationHandler(Joi.object({ idDocument: idDocumentSchema }), 'params'),
-        corporationController.showDocument
+        documentController.showDocument
     );
 
     router.post('/corporation/document/new',
         authAdmin,
-        corporationController.uploadDocument,
-        corporationController.newCorporationDocument
+        documentController.uploadDocument,
+        documentController.newDocument
     );
 
     router.delete('/corporation/document/:idDocument',
         authAdmin,
         validationHandler(Joi.object({ idDocument: idDocumentSchema }), 'params'),
-        corporationController.deleteDocument
+        documentController.deleteDocument
     );
 
     /*DOWNLOAD DOCUMENT*/
 
     router.get('/document/:file',
         authAdmin,
-        corporationController.sendDocument
+        documentController.sendDocument
     );
 
     /*CORPORATION CONTACT INFORMATIÓN*/
