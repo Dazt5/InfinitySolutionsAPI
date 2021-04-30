@@ -219,6 +219,13 @@ module.exports = () => {
         corporationController.deleteDocument
     );
 
+    /*DOWNLOAD DOCUMENT*/
+
+    router.get('/document/:file',
+        authAdmin,
+        corporationController.sendDocument
+    );
+
     /*CORPORATION CONTACT INFORMATIÓN*/
 
     router.get('/corporation/:idCorporation/contact',

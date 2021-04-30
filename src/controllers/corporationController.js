@@ -3,15 +3,22 @@ const Corporation = require('../models/Corporation');
 const Contact = require('../models/Contact');
 const CorporationDocuments = require('../models/CorporationDocuments')
 
+const {
+    exist_route,
+    delete_file
+} = require('../libs/files');
 const multer = require('multer');
 const shortid = require('shortid');
+
+const UPLOAD_ROUTE = '/../uploads/';
+const UPLOAD_ROUTE_DOCUMENT = '/../documents/';
 
 const configurationUploadPicture = {
     limits: { fileSize: 4096000 },
     storage: fileStorage = multer.diskStorage({
         destination: (req, file, cb) => {
-            cb(null, __dirname + '../../uploads/corporation/picture/')
-
+            exist_route(__dirname + UPLOAD_ROUTE);
+            cb(null, __dirname + UPLOAD_ROUTE);
         },
         filename: (req, file, cb) => {//MUCHO CUIDADO CON EL ORDEN EN EL QUE ESE ENVÍAN LOS DATOS
             const extension = file.mimetype.split('/')[1]; //EL ARCHIVO DEBE SER LO ULTIMO QUE SE ENVÍE
@@ -225,7 +232,8 @@ const configurationUploadDocument = { //MUCHO CUIDADO CON EL ORDEN EN EL QUE ESE
     limits: { fileSize: 4096000 },    //EL ARCHIVO DEBE SER LO ULTIMO QUE SE ENVÍE
     storage: fileStorage = multer.diskStorage({
         destination: (req, file, cb) => {
-            cb(null, __dirname + '../../uploads/corporation/document/')
+            exist_route(__dirname + UPLOAD_ROUTE_DOCUMENT);
+            cb(null, __dirname + UPLOAD_ROUTE_DOCUMENT)
 
         },
         filename: (req, file, cb) => {
@@ -306,10 +314,12 @@ exports.newCorporationDocument = async (req, res) => {
         });
 
         if (!corporation) {
+            delete_file(__dirname + UPLOAD_ROUTE_DOCUMENT + `/${req.file.filename}`)
+
             return res.status(404).json({
                 success: false,
                 message: 'La empresa no está registrada.'
-            });
+            });        
         }
 
         const document = new CorporationDocuments({
@@ -318,7 +328,8 @@ exports.newCorporationDocument = async (req, res) => {
         });
 
         if (req.file) {
-            document.file = req.file.filename
+            document.file = req.file.filename;
+            document.url = `http://${process.env.HOST}:${process.env.PORT}/document/${req.file.filename}`
         }
 
         await document.save();
@@ -419,6 +430,39 @@ exports.deleteDocument = async (req, res) => {
         });
 
     } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            success: false,
+            message: 'Ha ocurrido un error procesando la solicitud'
+        });
+    }
+}
+
+exports.sendDocument = async (req,res) => {
+
+    const { file} = req.params;
+
+    try{
+
+        const document = await CorporationDocuments.findOne({
+            file
+        });
+
+        if(!document){
+            return res.status(404).json({
+                success: false,
+                message: 'El documento que está solicitando ya no existe'
+            });
+        }
+
+        return res.status(200).download(__dirname + UPLOAD_ROUTE_DOCUMENT+ `/${document.file}`,(err) =>{
+            if(err){
+                console.log(err);
+            }
+
+        });
+
+    }catch(error){
         console.log(error);
         return res.status(500).json({
             success: false,

@@ -6,6 +6,8 @@ const documentsSchema = new Schema({
     name: {
         type: String
     },
+    
+    url: String,
 
     file: String,
 
