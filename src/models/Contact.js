@@ -4,30 +4,28 @@ const Schema = mongoose.Schema;
 const contactSchema = new Schema({
 
     station: String,
-    country:String,
-    state:String,
+    country: String,
+    state: String,
     city: String,
     address: String,
-    emails: [{
+    contact: [{
         department: {
-            type: String,
-            trim: true
+            type: String
         },
-        email: {
-            type: String,
-            trim: true,
-            lowercase: true
-        }
-    }],
-    phone_numbers: [{
-        department: {
-            type: String,
-            trim: true
-        },
-        phone_number: {
-            type: String,
-            trim: true,
-        }
+        emails: [{
+            email: {
+                type: String,
+                lowercase: true
+            }
+        }],
+        phone_numbers: [{
+            country_code: {
+                type: String
+            },
+            phone_number: {
+                type: String
+            }
+        }]
     }],
     corporation: {
         type: Schema.ObjectId,
@@ -45,26 +43,27 @@ JSON post ContactInfo
        "state":"Zulia",
        "city":"Maracaibo",
        "address":"Pomona, Avenida 45.",
-       "emails":[ 
-            {
-            "department": "Consultoría",
-            "email": "consuloria@email.com"
-            },
-            {
+        "contact":[
             "department": "Administración",
-            "email": "administración@email.com"
-            }
-       ],
-       "phone_numbers":[ 
-            {
-            "department": "Consultoría",
-            "phone_number": "+58 414-4444444"
-            },
-            {
-            "department": "Administración",
-            "phone_number": "+58 412-5555555"
-            }
-       ],
+            "emails":[
+                {
+                    "email":"administracion@cantv.com"
+                },
+                {
+                    "email":"soporteadministracion@cantv.com"
+                }
+            ],
+            "phone_numbers":[
+                {
+                    "country_code": "+58",
+                    "phone_number": "4146863670"
+                },
+                {
+                    "country_code": "+57",
+                    "phone_number": "3026241411"
+                }
+            ]
+        ]
        "id_corporation": "_id Corporation" //if the request is put, remove this line
 }
 */
