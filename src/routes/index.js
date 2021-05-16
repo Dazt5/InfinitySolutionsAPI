@@ -48,7 +48,12 @@ const {
 const {
     idFaqSchema,
     faqSchema
-} = require('../libs/schemas/faq')
+} = require('../libs/schemas/faq');
+
+const {
+    idStatusSchema,
+    statusSchema
+} = require('../libs/schemas/status');
 
 /**VALIDATION HANDLER*/
 const validationHandler = require('../middlewares/validationHandler');
@@ -291,20 +296,32 @@ module.exports = () => {
 
     /*STATUS*/
 
-    //TODO GET ROUTE
+    router.get('/status',
+        authAdmin,
+        statusController.getStatuses
+    );
+
+    router.get('/status/:idStatus',
+        authAdmin,
+        validationHandler(Joi.object({ idStatus: idStatusSchema }), 'params'),
+        statusController.getStatus
+    );
 
     router.post('/status/new',
         authAdmin,
+        validationHandler(statusSchema),
         statusController.validateStatus,
         statusController.newStatus
     );
 
     router.put('/status/:idStatus',
         authAdmin,
+        validationHandler(statusSchema),
         statusController.editStatus
     );
     router.delete('/status/:idStatus',
         authAdmin,
+        validationHandler(Joi.object({ idStatus: idStatusSchema }), 'params'),
         statusController.deleteStatus)
 
     return router;
