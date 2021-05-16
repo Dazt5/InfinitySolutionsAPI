@@ -38,22 +38,23 @@ module.exports = mongoose.model('Contact', contactSchema);
 /*
 JSON post ContactInfo
 {
-       "station":"Estación Central",
-       "country": "Venezuela",
-       "state":"Zulia",
-       "city":"Maracaibo",
-       "address":"Pomona, Avenida 45.",
-        "contact":[
+    "station": "Estación Central",
+    "country": "Venezuela",
+    "state": "Zulia",
+    "city": "Maracaibo",
+    "address": "Pomona, Avenida 45.",
+    "contact": [
+        {
             "department": "Administración",
-            "emails":[
+            "emails": [
                 {
-                    "email":"administracion@cantv.com"
+                    "email": "administracion@cantv.com"
                 },
                 {
-                    "email":"soporteadministracion@cantv.com"
+                    "email": "soporteadministracion@cantv.com"
                 }
             ],
-            "phone_numbers":[
+            "phone_numbers": [
                 {
                     "country_code": "+58",
                     "phone_number": "4146863670"
@@ -63,7 +64,8 @@ JSON post ContactInfo
                     "phone_number": "3026241411"
                 }
             ]
-        ]
-       "id_corporation": "_id Corporation" //if the request is put, remove this line
+        }
+    ],
+    "id_corporation":"id_corporation" // if request is put remove this line
 }
 */
