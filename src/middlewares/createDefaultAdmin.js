@@ -17,7 +17,8 @@ const createDefaultAdmin = async () => {
         const defaultCredentials = {
             email: 'admin@infinitySolutions.com',
             password: await hashPassword('Adminpassword1'),
-            fullname: 'MASTER ADMIN',
+            name: 'MASTER ADMIN',
+            lastname: 'MASTER ADMIN',
             phone_number: '04146863670',
             activated: 1,
             auth_level: 2

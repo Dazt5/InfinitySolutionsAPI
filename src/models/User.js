@@ -13,25 +13,21 @@ const userSchema = new Schema({
         type:String,
         required:true
     },
-
     name:{
         type:String,
         required:true,
         trim:true
     },
-
     lastname:{
         type:String,
         required:true,
         trim:true
     },
-
     phone_number:{
         type:String,
         trim:true
     },
     image:String,
-
     auth_level:{
         type: Number,
         default:1
@@ -46,7 +42,6 @@ const userSchema = new Schema({
 
     recoveryToken:String,
     recoveryExpirationToken:Date,
-
     create_at:{
         type:Date,
         default: Date.now()
