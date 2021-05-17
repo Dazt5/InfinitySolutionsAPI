@@ -316,13 +316,15 @@ module.exports = () => {
 
     router.put('/status/:idStatus',
         authAdmin,
+        validationHandler(Joi.object({ idStatus: idStatusSchema }), 'params'),
         validationHandler(statusSchema),
         statusController.editStatus
     );
     router.delete('/status/:idStatus',
         authAdmin,
         validationHandler(Joi.object({ idStatus: idStatusSchema }), 'params'),
-        statusController.deleteStatus)
+        statusController.deleteStatus
+    );
 
     return router;
 }
