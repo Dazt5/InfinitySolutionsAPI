@@ -10,6 +10,7 @@ const authController = require('../controllers/authController');
 const ticketController = require('../controllers/ticketController');
 const favoriteController = require('../controllers/favoriteController');
 const userController = require('../controllers/userController');
+const chatController = require('../controllers/chatController');
 
 /*ADMINS CONTROLLERS*/
 const corporationController = require('../controllers/corporationController');
@@ -152,18 +153,25 @@ module.exports = () => {
     /*CORPORATION*/
     router.get('/corporation',
         authUser,
-        corporationController.showAllCorporation);
+        corporationController.showAllCorporation
+    );
 
     router.get('/corporation/:idCorporation',
         authUser,
         validationHandler(Joi.object({ idCorporation: idCorporationSchema }), 'params'),
-        corporationController.showCorporation);
+        corporationController.showCorporation
+    );
 
     router.get('/corporation/:idCorporation/FAQ',
         authUser,
         validationHandler(Joi.object({ idCorporation: idCorporationSchema }), 'params'),
         faqController.getFaqs
-    )
+    );
+
+    router.get('/chat',
+        authUser,
+        chatController.joinChat,
+    );
 
     /*------- ADMIN ROUTES ---------*/
 
