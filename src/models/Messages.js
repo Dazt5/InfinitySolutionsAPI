@@ -1,13 +1,12 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const chatSchema = new Schema({
+const messagesSchema = new Schema({
 
     room: {
         type: Schema.ObjectId,
-        ref: 'User'
+        ref: 'Room'
     },
-
     user: {
         type: Schema.ObjectId,
         ref: 'User'
@@ -15,14 +14,13 @@ const chatSchema = new Schema({
 
     message: {
         type: String,
-        trim: true
+        trim:true,
     },
 
     create_at: {
         type: Date,
         default: Date.now()
-    },
-
+    }
 })
 
-module.exports = mongoose.model('Chat', chatSchema);
+module.exports = mongoose.model('Messages', messagesSchema);

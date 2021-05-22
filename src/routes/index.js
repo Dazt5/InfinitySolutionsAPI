@@ -173,6 +173,11 @@ module.exports = () => {
         chatController.joinChat,
     );
 
+    router.post('/chat',
+        authUser,
+        chatController.sendMessage
+    );
+
     /*------- ADMIN ROUTES ---------*/
 
     router.get('/user/profile/:userId',

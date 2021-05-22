@@ -22,14 +22,26 @@ const { logErrors, wrapErrors, errorHandler } = require('./middlewares/errorHand
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use(cors('*'));
+app.use(cors());
 app.use(helmet());
 
 /*public folders*/
 app.use(express.static('./src/uploads'));
 
-socket.connect(server);
+socket.connect(server, {
+  cors:{
+    origins:["*"],
 
+    handlePreflightRequest: (req, res) => {
+      res.writeHead(200, {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET,POST",
+        "Access-Control-Allow-Headers": "my-custom-header",
+        "Access-Control-Allow-Credentials":true
+      })
+    }
+  }
+});
 /*ROUTES*/
 app.use(router());
 
