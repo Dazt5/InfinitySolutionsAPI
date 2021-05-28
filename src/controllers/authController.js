@@ -12,7 +12,7 @@ const { randomBytes } = require('crypto');
 /*      SIGNUP    */
 exports.signUp = async (req, res) => {
 
-    const { email, password, fullname, phone_number } = req.body;
+    const { email, password, name,lastname, phone_number } = req.body;
 
     try {
 
@@ -30,7 +30,8 @@ exports.signUp = async (req, res) => {
         const user = new User({
             email,
             password,
-            fullname,
+            name,
+            lastname,
             phone_number
         });
 
@@ -70,12 +71,15 @@ exports.login = async (req, res) => {
     const { email, password } = req.body;
 
     try {
-        const user = await User.findOne({ email });
+        const user = await User.findOne({
+            email,
+            activated:1
+        });
 
         if (!user) {
             return res.status(401).json({
                 success: false,
-                message: 'Usuario o contraseña inválida'
+                message: 'Email o contraseña inválida, asegurese que su cuenta este activada '
             });
         } else {
             const passwordMatch = await comparePassword(password, user.password)
@@ -83,10 +87,14 @@ exports.login = async (req, res) => {
             if (!passwordMatch) {
                 return res.status(401).json({
                     success: false,
-                    message: 'Usuario o contraseña inválida'
+                    message: 'Email o contraseña inválida'
                 });
             } else {
                 const token = await getToken(user.email);
+
+                user.last_access = Date.now();
+
+                await user.save();
 
                 return res.status(200).json({
                     success: true,

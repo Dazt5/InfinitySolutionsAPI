@@ -21,6 +21,62 @@ exports.validateStatus = (req, res, next) => {
     next();
 }
 
+exports.getStatuses = async (req,res) =>{
+
+    try{
+        const status = await Status.find();
+
+        if(!status){
+            return res.status(404).json({
+                success: false,
+                message: 'Ha ocurrido un error'
+            });
+        }
+
+        return res.status(200).json({
+            success:true,
+            status
+        });
+
+    }catch(error){
+        return res.status(500).json({
+            success: false,
+            message: 'Ha ocurrido un error inesperado...'
+        });
+    }
+
+}
+
+exports.getStatus = async (req,res) =>{
+
+    const {idStatus} = req.params;
+
+    try{
+        const status = await Status.findOne({
+            _id:idStatus
+        });
+
+        if(!status){
+            return res.status(404).json({
+                success: false,
+                message: 'El status al que hace referencia ya no existe'
+            });
+        }
+
+        return res.status(200).json({
+            success:true,
+            status
+        });
+
+    }catch(error){
+        return res.status(500).json({
+            success: false,
+            message: 'Ha ocurrido un error inesperado...'
+        });
+    }
+
+}
+
 exports.newStatus = async (req, res) => {
 
     const status = new Status(req.body);
@@ -32,14 +88,13 @@ exports.newStatus = async (req, res) => {
 
         await status.save();
 
-        return res.status(200).json({
+        return res.status(201).json({
             success: true,
             message: 'Status creado correctamente.'
         });
 
     } catch (error) {
         console.log(error);
-
         return res.status(500).json({
             success: false,
             message: error
@@ -59,22 +114,25 @@ exports.editStatus = async (req, res) => {
                 new: true
             });
 
-        res.status(200).json({
+            if (!status) {
+
+                return res.status(401).json({
+                    success: false,
+                    message: 'No se encontró ese Status, recargue e intentelo de nuevo'
+                });
+            }
+
+        return res.status(200).json({
             success: true,
             message: 'Status actualizado correctamente.'
         })
 
-        if (!status) {
-
-            return res.status(401).json({
-                success: false,
-                message: 'No se encontró ese Status, recargue e intentelo de nuevo'
-            });
-        }
-
     } catch (error) {
-
         console.log(error);
+        return res.status(500).json({
+            success: false,
+            message: 'Ha ocurrido un error inesperado.'
+        });
 
     }
 }
@@ -87,16 +145,17 @@ exports.deleteStatus = async (req, res) => {
 
         await Status.findOneAndDelete({ _id: idStatus });
 
-        res.status(200).json({
+        return res.status(200).json({
             success: true,
             message: 'Status Eliminado'
 
         })
 
     } catch (error) {
-
         console.log(error);
+        return res.status(500).json({
+            success: false,
+            message: 'Ha ocurrido un error inesperado.'
+        });
     }
-
-
 }

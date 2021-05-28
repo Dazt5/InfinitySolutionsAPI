@@ -55,37 +55,30 @@ const contactSchema = Joi.object({
         'string.min': 'La dirección es demasiado corta.',
     }),
 
-    emails: Joi.array().items(Joi.object({
+    contact: Joi.array().items(Joi.object({
         department: Joi.string().required().messages({
             'any.required': 'Debe ingresar un nombre que haga referencia al departamento de este email.',
             'string.empty': 'El nombre del departamento no puede estar vácio.'
         }),
-        email: Joi.string().email().required().messages({
-            'any.required': 'Debe ingresar un email.',
-            'string.email': 'Existe un email inválido.',
-            'string.empty': 'El email no puede ir vácio.'
-        })
+        emails: Joi.array().items(Joi.object({
+            email: Joi.string().required().email().messages({
+                'any.required': 'Debe ingresar un email',
+                'string.email': 'El email ingresado es invalido'
+            })
+        })),
+        phone_numbers: Joi.array().items(Joi.object({
+            country_code: Joi.string().required().messages({
+                'any.required': 'Debe Ingresar el código del pais.'
+            }),
+            phone_number: Joi.number().required().messages({
+                'any.required': 'Debe Ingresar un número de teléfono.'
+            })
+        }))
     })).required().min(1).messages({
-        'any.required': 'Debe completar la información de contacto, ingrese un email.',
-        'string.empty': 'Debe completar la información de contacto, ingrese un email.',
+        'any.required': 'Debe completar la información de contacto.',
+        'string.empty': 'Debe completar la información de contacto.',
         'array.min': 'Debe completar la información de contacto.',
     }),
-
-    phone_numbers: Joi.array().items(Joi.object({
-        department: Joi.string().required().messages({
-            'any.required': 'Debe ingresar un nombre que haga referencia al departamento de este email.',
-            'string.empty': 'El nombre del departamento no puede estar vácio.'
-        }),
-        phone_number: Joi.string().required().messages({
-            'any.required': 'Debe ingresar un número telefónico.',
-            'string.empty': 'El número telefónico no puede ir vácio.'
-        })
-    })).required().min(1).messages({
-        'any.required': 'Debe completar la información de contacto, ingrese un número telefónico',
-        'string.empty': 'Debe completar la información de contacto, ingrese un número telefónico',
-        'array.min': 'Debe completar la información de contacto, ingrese un número telefónico',
-    }),
-
 
     id_corporation: Joi.string().regex(mongoId).required().messages({
         'any.required': 'Debe elegir una corporación',

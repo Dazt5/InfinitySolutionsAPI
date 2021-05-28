@@ -10,6 +10,7 @@ const authController = require('../controllers/authController');
 const ticketController = require('../controllers/ticketController');
 const favoriteController = require('../controllers/favoriteController');
 const userController = require('../controllers/userController');
+const chatController = require('../controllers/chatController');
 
 /*ADMINS CONTROLLERS*/
 const corporationController = require('../controllers/corporationController');
@@ -48,7 +49,12 @@ const {
 const {
     idFaqSchema,
     faqSchema
-} = require('../libs/schemas/faq')
+} = require('../libs/schemas/faq');
+
+const {
+    idStatusSchema,
+    statusSchema
+} = require('../libs/schemas/status');
 
 /**VALIDATION HANDLER*/
 const validationHandler = require('../middlewares/validationHandler');
@@ -147,18 +153,30 @@ module.exports = () => {
     /*CORPORATION*/
     router.get('/corporation',
         authUser,
-        corporationController.showAllCorporation);
+        corporationController.showAllCorporation
+    );
 
     router.get('/corporation/:idCorporation',
         authUser,
         validationHandler(Joi.object({ idCorporation: idCorporationSchema }), 'params'),
-        corporationController.showCorporation);
+        corporationController.showCorporation
+    );
 
     router.get('/corporation/:idCorporation/FAQ',
         authUser,
         validationHandler(Joi.object({ idCorporation: idCorporationSchema }), 'params'),
         faqController.getFaqs
-    )
+    );
+
+    router.get('/chat',
+        authUser,
+        chatController.joinChat,
+    );
+
+    router.post('/chat',
+        authUser,
+        chatController.sendMessage
+    );
 
     /*------- ADMIN ROUTES ---------*/
 
@@ -291,21 +309,35 @@ module.exports = () => {
 
     /*STATUS*/
 
-    //TODO GET ROUTE
+    router.get('/status',
+        authAdmin,
+        statusController.getStatuses
+    );
+
+    router.get('/status/:idStatus',
+        authAdmin,
+        validationHandler(Joi.object({ idStatus: idStatusSchema }), 'params'),
+        statusController.getStatus
+    );
 
     router.post('/status/new',
         authAdmin,
+        validationHandler(statusSchema),
         statusController.validateStatus,
         statusController.newStatus
     );
 
     router.put('/status/:idStatus',
         authAdmin,
+        validationHandler(Joi.object({ idStatus: idStatusSchema }), 'params'),
+        validationHandler(statusSchema),
         statusController.editStatus
     );
     router.delete('/status/:idStatus',
         authAdmin,
-        statusController.deleteStatus)
+        validationHandler(Joi.object({ idStatus: idStatusSchema }), 'params'),
+        statusController.deleteStatus
+    );
 
     return router;
 }
