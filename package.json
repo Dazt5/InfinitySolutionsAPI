@@ -4,8 +4,8 @@
   "description": "Api for InfinitySolution´s System",
   "main": "app.js",
   "scripts": {
-    "start": "NODE_ENV=production ./src/app.js",
-    "dev": "NODE_ENV=development DEBUG=app:* nodemon ./src/app.js"
+    "start": "set NODE_ENV=production&& ./src/app.js",
+    "dev": "set NODE_ENV=development&& set DEBUG=app:*&& nodemon ./src/app.js"
   },
   "author": "David Alvarez",
   "license": "MIT",
