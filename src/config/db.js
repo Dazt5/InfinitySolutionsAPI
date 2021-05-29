@@ -20,7 +20,9 @@ if (config.dbLocal) {
 mongoose.connect(MONGO_URI, {
     useUnifiedTopology: true,
     useNewUrlParser: true,
-    useCreateIndex: true
+    useCreateIndex: true,
+    useFindAndModify: false,
+
 });
 /*MONGO CONNECT*/
 mongoose.connection.on('error', async (error) => {

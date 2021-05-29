@@ -2,11 +2,16 @@ const Joi = require('@hapi/joi');
 
 const signupSchema = Joi.object({
 
-    fullname: Joi.string().required().regex(/^[a-zA-Z]{3,35}(?: [a-zA-Z]+){0,3}$/).messages({
-        'any.required': 'Debe ingresar su nombre y apellido',
-        'string.empty': 'Su nombre completo no puede ir vácio',
-        'string.pattern.base': 'Su nombre completo no debe contener números ni mas de un espacio entre si'
+    name: Joi.string().required().messages({
+        'any.required': 'Debe ingresar su nombre',
+        'string.empty': 'El nombre no puede ir vácio'
     }),
+
+    lastname: Joi.string().required().messages({
+        'any.required': 'Debe ingresar su apellido',
+        'string.empty': 'El apellido no puede ir vácio'
+    }),
+
     email: Joi.string().email().required().messages({
         'any.required': 'Debe ingresar un email',
         'string.email': 'El email que ha ingresado no es válido',
