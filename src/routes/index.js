@@ -192,6 +192,13 @@ module.exports = () => {
         userController.getUserByEmail
     );
 
+    //* ADMIN TICKETS */
+    router.patch('/ticket/:idTicket',
+        authAdmin,
+        validationHandler(Joi.object({ idTicket: idTicketSchema }), 'params'),
+        ticketController.changeTicketStatus
+    );
+
     //* CORPORATION */
     router.post('/corporation/new',
         authAdmin,

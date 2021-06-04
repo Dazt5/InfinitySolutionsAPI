@@ -5,6 +5,7 @@ const Status = require('../models/Status');
 
 /* LIBS */
 const { decodeToken } = require('../libs/authToken');
+const Corporation = require('../models/Corporation');
 
 exports.showAllUserTickets = async (_, res) => {
 
@@ -95,18 +96,40 @@ exports.newTicket = async (req, res) => {
     const { email } = decodeToken(res.locals.token);
 
     try {
-        var user = await User.findOne({ email });
-        var status = await Status.findOne({ default: 1 });
+   
 
-        ticket.user = user._id;
-        ticket.status = status._id;
+        const validUser = await User.findOne({ email });
 
-        if (!user) {
+        if (!validUser) {
             return res.status(404).json({
                 success: false,
                 message: 'Sus credenciales no coinciden con un usuario registrado'
             });
         }
+
+        const defaultStatus = await Status.findOne({ default: 1 });
+
+        if (!defaultStatus) {
+            return res.status(404).json({
+                success: false,
+                message: 'El Status al que hace referencia no se encuentra disponible'
+            });
+        }
+
+        const validCorporation = await Corporation.findOne({
+            _id: corporation
+        });
+
+        if (!validCorporation) {
+            return res.status(404).json({
+                success: false,
+                message: 'La corporación a la que hace referencia ya no se encuentra disponible'
+            });
+        }
+
+        ticket.user = validUser._id;
+        ticket.corporation = corporation
+        ticket.status = defaultStatus._id;
 
         await ticket.save();
 
@@ -124,7 +147,7 @@ exports.newTicket = async (req, res) => {
     }
 }
 
-//Only for admins
+//Dudando de ponerlo :TODO
 exports.editTicket = async (req, res) => {
 
     const { id } = req.params;
@@ -153,6 +176,55 @@ exports.editTicket = async (req, res) => {
                 message: 'El ticket al que hace referencia no existe.'
             });
         }
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            success: false,
+            message: 'Ha ocurrido un error inesperado'
+        });
+    }
+
+}
+
+exports.changeTicketStatus = async (req, res) => {
+    
+    const { idTicket } = req.params;
+    const { idNewStatus } = req.body;
+
+    try {
+        const ticket = await Ticket.findOne({
+            _id: idTicket
+        });
+
+        if (!ticket) {
+            return res.status(404).json({
+                success: false,
+                message: 'El ticket al que hace referencia ya no está disponible'
+            });  
+        }
+
+        const validStatus = await Status.findOne({
+            _id: idNewStatus
+        });
+
+        if (!validStatus) {
+            return res.status(404).json({
+                success: false,
+                message: 'El status al que hace referencia ya no está disponible'
+            });  
+        }
+
+        console.log(ticket);
+
+        ticket.status = validStatus._id;
+
+        await ticket.save();
+
+        return res.status(200).json({
+            success: false,
+            message: 'Se ha cambiado el status del ticket satisfactoriamente'
+        }); 
+
     } catch (error) {
         console.log(error);
         return res.status(500).json({
