@@ -23,7 +23,8 @@ exports.showAllUserTickets = async (_, res) => {
 
         const ticket = await Ticket.find(
             { user: user._id })
-            .populate('corporation').populate('status');
+            .populate('corporation', 'name rif image')
+            .populate('status', 'name color');
 
         if (!ticket) {
             return res.status(401).json({
@@ -61,7 +62,10 @@ exports.showUserTicket = async (req, res) => {
         const ticket = await Ticket.findOne(
             {
                 _id: idTicket,
-            }).populate('user').populate('corporation').populate('status');
+            })
+            .populate('user', '_id name lastname email phone_number auth_level activated last_access')
+            .populate('corporation', 'name rif image')
+            .populate('status', 'name color');
 
         if (!ticket) {
             return res.status(404).json({
@@ -213,8 +217,6 @@ exports.changeTicketStatus = async (req, res) => {
                 message: 'El status al que hace referencia ya no está disponible'
             });  
         }
-
-        console.log(ticket);
 
         ticket.status = validStatus._id;
 
