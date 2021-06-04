@@ -135,7 +135,7 @@ module.exports = () => {
     /*FAVORITES*/
     router.get('/favorite',
         authUser,
-        favoriteController.showFavorite
+        favoriteController.showFavorites
     );
 
     router.post('/favorite/new',
