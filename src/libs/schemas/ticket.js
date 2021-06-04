@@ -33,7 +33,17 @@ const ticketSchema = Joi.object({
 
 });
 
+const responseTicketSchema = Joi.object({
+    message: Joi.string().min(10).max(100).required().messages({
+        'any.required': 'El mensaje no puede enviarse vacio.',
+        'string.empty': 'El mensaje no puede enviarse vácio.',
+        'string.max': 'El debe tener como minimo 10 caracteres',
+        'string.min': 'El mensaje no puede sobrepasar los 100 caracteres',
+    }),
+})
+
 module.exports = {
     idTicketSchema,
-    ticketSchema
+    ticketSchema,
+    responseTicketSchema
 };

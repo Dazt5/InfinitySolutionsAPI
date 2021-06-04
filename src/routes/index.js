@@ -36,6 +36,7 @@ const {
 const {
     ticketSchema,
     idTicketSchema,
+    responseTicketSchema
 } = require('../libs/schemas/ticket');
 
 const {
@@ -130,6 +131,19 @@ module.exports = () => {
         authUser,
         validationHandler(ticketSchema),
         ticketController.newTicket
+    );
+
+    router.post('/ticket/:idTicket/response',
+        authUser,
+        validationHandler(Joi.object({ idTicket: idTicketSchema }), 'params'),
+        validationHandler(responseTicketSchema),
+        ticketController.addTicketResponse
+    );
+
+    router.get('/ticket/:idTicket/response',
+        authUser,
+        validationHandler(Joi.object({ idTicket: idTicketSchema }), 'params'),
+        ticketController.getTicketsResponse
     );
 
     /*FAVORITES*/

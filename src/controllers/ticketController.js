@@ -1,11 +1,15 @@
 /*MONGOOSE SCHEMAS*/
 const Ticket = require('../models/Tickets');
+const TicketResponse = require('../models/TicketResponse');
 const User = require('../models/User');
 const Status = require('../models/Status');
 
 /* LIBS */
 const { decodeToken } = require('../libs/authToken');
 const Corporation = require('../models/Corporation');
+const { user } = require('../config/email');
+const { find } = require('../models/User');
+const { valid } = require('@hapi/joi');
 
 exports.showAllUserTickets = async (_, res) => {
 
@@ -234,5 +238,101 @@ exports.changeTicketStatus = async (req, res) => {
             message: 'Ha ocurrido un error inesperado'
         });
     }
+}
 
+
+exports.addTicketResponse = async (req, res) => {
+    const { email } = decodeToken(res.locals.token);
+    const { idTicket } = req.params;
+    const { message } = req.body;
+
+    try {
+
+        const validUser = await User.findOne({
+            email
+        });
+
+        if (!validUser) {
+            return res.status(404).json({
+                success: false,
+                message: 'El usuario al que hace referencia no está disponible'
+            });
+        }
+
+        const validTicket = await Ticket.findOne({
+            _id: idTicket
+        });
+
+        if (!validTicket) {
+            return res.status(404).json({
+                success: false,
+                message: 'El ticket al que hace referencia no está disponible'
+            })
+        }
+
+        const newResponse = new TicketResponse({message});
+        
+        newResponse.ticket = validTicket._id;
+        newResponse.user = validUser._id;
+
+        newResponse.save();
+
+        return res.status(201).json({
+            success: true,
+            message: 'Mensaje enviado satisfactoriamente'
+        });
+
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            success: false,
+            message: 'Ha ocurrido un error inesperado'
+        });
+    }
+}
+
+exports.getTicketsResponse = async (req, res) => {
+    const { email } = decodeToken(res.locals.token);
+    const { idTicket } = req.params;
+
+    try {
+
+        const validUser = await User.findOne({
+            email
+        })
+
+        if (!validUser) {
+            return res.status(404).json({
+                success: false,
+                message: 'El usuario al que hace referencia no está disponible'
+            });
+        }
+
+        const validTicket = await Ticket.findOne({
+            _id: idTicket
+        });
+
+        if (!validTicket) {
+            return res.status(404).json({
+                success: false,
+                message: 'El ticket al que hace referencia no está disponible'
+            })
+        }
+    
+        const ticketResponse = await TicketResponse.find({
+            ticket:idTicket
+        }).sort({create_at:'asc'}).populate('User','_id name lastname email auth_level')
+
+        return res.status(200).json({
+            success: true,
+            ticketResponse
+        });
+
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            success: false,
+            message: 'Ha ocurrido un error inesperado'
+        });
+    }
 }
