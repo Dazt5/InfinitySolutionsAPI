@@ -13,6 +13,8 @@ const config = {
     dbName: process.env.DB_NAME,
     dbLocal: process.env.NODE_ENV === 'development' ? process.env.DB_LOCAL : false,
 
+    frontServer: process.env.FRONT_SERVER,
+
     emailUser: process.env.EMAIL_USER,
     emailPassword: process.env.EMAIL_PASSWORD,
     emailHost: process.env.EMAIL_HOST,
