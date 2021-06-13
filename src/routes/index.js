@@ -22,6 +22,7 @@ const documentController = require('../controllers/documentController');
 const {
     signupSchema,
     loginSchema,
+    resendActivationSchema,
     recoverAccountSchema,
 } = require('../libs/schemas/authentication');
 
@@ -84,6 +85,7 @@ module.exports = () => {
     );
 
     router.post('/recover',
+        validationHandler(resendActivationSchema),
         authController.sendRecoverToken
     );
 

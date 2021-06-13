@@ -46,6 +46,15 @@ const loginSchema = Joi.object({
     }),
 });
 
+const resendActivationSchema = Joi.object({
+    email: Joi.string().email().required().messages({
+        'any.required': 'Debe ingresar un email',
+        'string.email': 'El email que ha ingresado no es válido',
+        'string.empty': 'El email no puede ir vácio'
+    }),
+
+})
+
 const recoverAccountSchema = Joi.object({
     password: Joi.string().min(8).required().messages({
         'any.required': 'Debe ingresar una nueva contraseña',
@@ -62,5 +71,6 @@ const recoverAccountSchema = Joi.object({
 module.exports = {
     signupSchema,
     loginSchema,
+    resendActivationSchema,
     recoverAccountSchema
 }
