@@ -7,9 +7,6 @@ const Status = require('../models/Status');
 /* LIBS */
 const { decodeToken } = require('../libs/authToken');
 const Corporation = require('../models/Corporation');
-const { user } = require('../config/email');
-const { find } = require('../models/User');
-const { valid } = require('@hapi/joi');
 
 exports.showAllUserTickets = async (_, res) => {
 
@@ -88,7 +85,32 @@ exports.showUserTicket = async (req, res) => {
             message: 'No se ha podido procesar la solicitud'
         });
     }
+}
 
+exports.showWaitingTickets = async (req, res) => {
+
+    try {
+
+        const status = await Status.findOne({
+            name: 'waiting'
+        })
+
+        const allTickets = await Ticket.find({
+            status: status.id
+        }).populate('corporation', 'name rif image');
+
+        return res.status(200).json({
+            success: true,
+            allTickets
+        });
+
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            success: false,
+            message: 'No se ha podido procesar la solicitud'
+        });
+    }
 }
 
 exports.newTicket = async (req, res) => {
@@ -104,7 +126,7 @@ exports.newTicket = async (req, res) => {
     const { email } = decodeToken(res.locals.token);
 
     try {
-   
+
 
         const validUser = await User.findOne({ email });
 
@@ -195,7 +217,7 @@ exports.editTicket = async (req, res) => {
 }
 
 exports.changeTicketStatus = async (req, res) => {
-    
+
     const { idTicket } = req.params;
     const { idNewStatus } = req.body;
 
@@ -208,7 +230,7 @@ exports.changeTicketStatus = async (req, res) => {
             return res.status(404).json({
                 success: false,
                 message: 'El ticket al que hace referencia ya no está disponible'
-            });  
+            });
         }
 
         const validStatus = await Status.findOne({
@@ -219,7 +241,7 @@ exports.changeTicketStatus = async (req, res) => {
             return res.status(404).json({
                 success: false,
                 message: 'El status al que hace referencia ya no está disponible'
-            });  
+            });
         }
 
         ticket.status = validStatus._id;
@@ -229,7 +251,7 @@ exports.changeTicketStatus = async (req, res) => {
         return res.status(200).json({
             success: false,
             message: 'Se ha cambiado el status del ticket satisfactoriamente'
-        }); 
+        });
 
     } catch (error) {
         console.log(error);
@@ -270,8 +292,8 @@ exports.addTicketResponse = async (req, res) => {
             })
         }
 
-        const newResponse = new TicketResponse({message});
-        
+        const newResponse = new TicketResponse({ message });
+
         newResponse.ticket = validTicket._id;
         newResponse.user = validUser._id;
 
@@ -318,10 +340,10 @@ exports.getTicketsResponse = async (req, res) => {
                 message: 'El ticket al que hace referencia no está disponible'
             })
         }
-    
+
         const ticketResponse = await TicketResponse.find({
-            ticket:idTicket
-        }).sort({create_at:'asc'}).populate('User','_id name lastname email auth_level')
+            ticket: idTicket
+        }).sort({ create_at: 'asc' }).populate('User', '_id name lastname email auth_level')
 
         return res.status(200).json({
             success: true,

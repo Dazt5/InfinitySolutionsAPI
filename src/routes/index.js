@@ -196,6 +196,13 @@ module.exports = () => {
 
     /*------- ADMIN ROUTES ---------*/
 
+    //* ADMIN TICKETS *//
+
+    router.get('/ticket/status/waiting',
+        authAdmin,
+        ticketController.showWaitingTickets
+    );
+
     router.get('/user/profile/:userId',
         authAdmin,
         validationHandler(Joi.object({ userId: idUserSchema }), 'params'),
