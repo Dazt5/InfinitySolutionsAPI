@@ -4,14 +4,12 @@ const Contact = require('../models/Contact');
 const CorporationDocuments = require('../models/Document')
 
 const {
-    exist_route,
-    delete_file
+    exist_route
 } = require('../libs/files');
 const multer = require('multer');
 const shortid = require('shortid');
 
 const UPLOAD_ROUTE = '/../uploads/';
-const UPLOAD_ROUTE_DOCUMENT = '/../documents/';
 
 const configurationUploadPicture = {
     limits: { fileSize: 4096000 },
@@ -71,10 +69,12 @@ exports.uploadPicture = (req, res, next) => {
 exports.newCorporation = async (req, res) => {
 
     const { name, rif } = req.body;
+    const { description } = req.body || null;
 
     const corporation = new Corporation({
         name,
-        rif
+        rif,
+        description
     });
 
     try {
@@ -103,11 +103,11 @@ exports.newCorporation = async (req, res) => {
 
 exports.editCorporation = async (req, res) => {
 
-    console.log(req.body);
-
     const { idCorporation } = req.params;
 
     const { name, rif } = req.body;
+
+    const { description } = req.body || null;
 
     try {
         const Previouscorporation = await Corporation.findOne({ _id: idCorporation });
@@ -119,7 +119,7 @@ exports.editCorporation = async (req, res) => {
             });
         }
 
-        let newCorporation = { name, rif };
+        let newCorporation = { name, rif,description };
 
         if (req.file) {
 
@@ -142,6 +142,7 @@ exports.editCorporation = async (req, res) => {
             success: true,
             message: 'Empresa actualizado correctamente.'
         });
+
     } catch (error) {
         console.log(error);
         return res.status(500).json({
