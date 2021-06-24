@@ -127,7 +127,6 @@ exports.newTicket = async (req, res) => {
 
     try {
 
-
         const validUser = await User.findOne({ email });
 
         if (!validUser) {
@@ -147,7 +146,8 @@ exports.newTicket = async (req, res) => {
         }
 
         const validCorporation = await Corporation.findOne({
-            _id: corporation
+            _id: corporation,
+            active:1
         });
 
         if (!validCorporation) {
