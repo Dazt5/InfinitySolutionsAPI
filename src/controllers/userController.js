@@ -120,6 +120,36 @@ exports.getUser = async (req, res) => {
 
 }
 
+exports.getAllUsers = async (req, res) => {
+    
+    try {
+        const users = await User.find({
+            auth_level:1
+        })
+            .select('_id name lastname email phone_number auth_level activated create_at last_access');
+        
+        if (!users) {
+            return res.status(404).json({
+                success: false,
+                message: "No se ha podido encontrar usuarios"
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            users
+        });
+
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({
+            success: false,
+            message: "Ha ocurrido un error inesperado..."
+        });
+    }
+
+} 
+
 exports.getUserById = async (req, res) => {
     const { userId } = req.params;
 

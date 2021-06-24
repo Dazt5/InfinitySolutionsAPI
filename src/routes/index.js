@@ -196,6 +196,13 @@ module.exports = () => {
 
     /*------- ADMIN ROUTES ---------*/
 
+    //GET ALL USERS //
+    
+    router.get('/users',
+        authAdmin,
+        userController.getAllUsers
+    );
+
     //* ADMIN TICKETS *//
 
     router.get('/ticket/status/waiting',
