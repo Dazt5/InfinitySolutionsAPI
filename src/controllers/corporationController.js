@@ -184,7 +184,7 @@ exports.desactivateCorporation = async (req, res) => {
         });
 
         if (!corporation) {
-            return res.status(500).json({
+            return res.status(404).json({
                 success: false,
                 message: 'La empresa ingresada no coincide con ninguna registrada'
             });
@@ -195,7 +195,7 @@ exports.desactivateCorporation = async (req, res) => {
         await corporation.save();
         
         return res.status(200).json({
-            success: false,
+            success: true,
             message: 'Modificada exitosamente'
         });
 
