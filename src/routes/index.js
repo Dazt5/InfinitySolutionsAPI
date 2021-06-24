@@ -242,6 +242,12 @@ module.exports = () => {
         corporationController.deleteCorporation
     );
 
+    router.patch('/desactivate/corporation/:idCorporation',
+        authAdmin,
+        validationHandler(Joi.object({ idCorporation: idCorporationSchema }), 'params'),
+        corporationController.desactivateCorporation
+    );
+
     /* CORPORATION DOCUMENTS */
 
     router.get('/corporation/:idCorporation/document',

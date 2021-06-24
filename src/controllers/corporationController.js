@@ -8,6 +8,7 @@ const {
 } = require('../libs/files');
 const multer = require('multer');
 const shortid = require('shortid');
+const { findOne } = require('../models/Corporation');
 
 const UPLOAD_ROUTE = '/../uploads/';
 
@@ -119,7 +120,7 @@ exports.editCorporation = async (req, res) => {
             });
         }
 
-        let newCorporation = { name, rif,description };
+        let newCorporation = { name, rif, description };
 
         if (req.file) {
 
@@ -138,7 +139,7 @@ exports.editCorporation = async (req, res) => {
             });
 
 
-        res.status(201).json({
+        return res.status(201).json({
             success: true,
             message: 'Empresa actualizado correctamente.'
         });
@@ -171,6 +172,42 @@ exports.deleteCorporation = async (req, res) => {
 
         });
     }
+}
+
+exports.desactivateCorporation = async (req, res) => {
+
+    const { idCorporation } = req.params;
+
+    try {
+        const corporation = await Corporation.findOne({
+            _id: idCorporation
+        });
+
+        if (!corporation) {
+            return res.status(500).json({
+                success: false,
+                message: 'La empresa ingresada no coincide con ninguna registrada'
+            });
+        }
+
+        corporation.active = !corporation.active;
+
+        await corporation.save();
+        
+        return res.status(200).json({
+            success: false,
+            message: 'Modificada exitosamente'
+        });
+
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json({
+            success: false,
+            message: 'Ha ocurrido un error inespeado.'
+
+        });
+    }
+
 }
 
 exports.showAllCorporation = async (_, res) => {
