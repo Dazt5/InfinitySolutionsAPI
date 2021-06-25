@@ -1,14 +1,12 @@
 /*MONGOOSE SCHEMAS*/
 const Corporation = require('../models/Corporation');
 const Contact = require('../models/Contact');
-const CorporationDocuments = require('../models/Document')
 
 const {
     exist_route
 } = require('../libs/files');
 const multer = require('multer');
 const shortid = require('shortid');
-const { findOne } = require('../models/Corporation');
 
 const UPLOAD_ROUTE = '/../uploads/';
 
@@ -27,7 +25,7 @@ const configurationUploadPicture = {
     }),
     fileFilter(req, file, cb) {
 
-        const { name, rif } = req.body;
+        const { name, rif,type } = req.body;
 
         if (!name) {
             cb(new Error('Debe ingresar un nombre a la corporación'));
@@ -35,6 +33,10 @@ const configurationUploadPicture = {
 
         if (!rif) {
             cb(new Error('Debe ingresar un RIF'));
+        }
+
+        if (!type) {
+            cb(new Error('Debe seleccionar el tipo de la empresa'));
         }
 
         if (file.mimetype === 'image/jpeg' || file.mimetype === 'image/jpg' || file.mimetype === 'image/png') {
@@ -69,13 +71,12 @@ exports.uploadPicture = (req, res, next) => {
 
 exports.newCorporation = async (req, res) => {
 
-    const { name, rif } = req.body;
-    const { description } = req.body || null;
+    const { name, rif, type } = req.body;
 
     const corporation = new Corporation({
         name,
         rif,
-        description
+        type
     });
 
     try {
@@ -106,9 +107,7 @@ exports.editCorporation = async (req, res) => {
 
     const { idCorporation } = req.params;
 
-    const { name, rif } = req.body;
-
-    const { description } = req.body || null;
+    const { name, rif, type } = req.body;
 
     try {
         const Previouscorporation = await Corporation.findOne({ _id: idCorporation });
@@ -120,7 +119,7 @@ exports.editCorporation = async (req, res) => {
             });
         }
 
-        let newCorporation = { name, rif, description };
+        let newCorporation = { name, rif,type};
 
         if (req.file) {
 
@@ -193,7 +192,7 @@ exports.desactivateCorporation = async (req, res) => {
         corporation.active = !corporation.active;
 
         await corporation.save();
-        
+
         return res.status(200).json({
             success: true,
             message: 'Modificada exitosamente'

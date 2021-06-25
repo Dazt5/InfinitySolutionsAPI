@@ -87,6 +87,40 @@ exports.showUserTicket = async (req, res) => {
     }
 }
 
+exports.showLastUserTicket = async (req, res) => {
+
+    const { email } = decodeToken(res.locals.token);
+
+    try {
+
+        const user = await User.findOne({ email });
+
+        if (!user) {
+            return res.status(401).json({
+                success: false,
+                message: 'No se ha podido procesar la solicitud'
+            });
+        }
+
+        const lastTickets = await Ticket.find(
+            { user: user._id })
+            .populate('corporation', 'name rif image')
+            .populate('status', 'name color');
+        
+            return res.status(200).json({
+                success: false,
+                lastTickets
+            });
+
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({
+            success: false,
+            message: 'No se ha podido procesar la solicitud'
+        });
+    }
+}
+
 exports.showWaitingTickets = async (req, res) => {
 
     try {
@@ -147,7 +181,7 @@ exports.newTicket = async (req, res) => {
 
         const validCorporation = await Corporation.findOne({
             _id: corporation,
-            active:1
+            active: 1
         });
 
         if (!validCorporation) {

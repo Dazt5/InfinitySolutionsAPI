@@ -123,6 +123,10 @@ module.exports = () => {
         ticketController.showAllUserTickets
     );
 
+    router.get('/lastTicket',
+        authUser
+    );
+
     router.get('/ticket/:idTicket',
         authUser,
         validationHandler(Joi.object({ idTicket: idTicketSchema }), 'params'),
@@ -178,6 +182,21 @@ module.exports = () => {
         corporationController.showCorporation
     );
 
+
+    /*CORPORATION CONTACT INFORMATIÓN*/
+
+    router.get('/corporation/:idCorporation/contact',
+        authUser,
+        validationHandler(Joi.object({ idCorporation: idCorporationSchema }), 'params'),
+        corporationController.showAllContactInfo
+    );
+
+    router.get('/corporation/contact/:idContact',
+        authUser,
+        validationHandler(Joi.object({ idContact: idContactSchema }), 'params'),
+        corporationController.showContactInfo
+    );
+
     router.get('/corporation/:idCorporation/FAQ',
         authUser,
         validationHandler(Joi.object({ idCorporation: idCorporationSchema }), 'params'),
@@ -197,7 +216,7 @@ module.exports = () => {
     /*------- ADMIN ROUTES ---------*/
 
     //GET ALL USERS //
-    
+
     router.get('/users',
         authAdmin,
         userController.getAllUsers
@@ -289,18 +308,6 @@ module.exports = () => {
     );
 
     /*CORPORATION CONTACT INFORMATIÓN*/
-
-    router.get('/corporation/:idCorporation/contact',
-        authAdmin,
-        validationHandler(Joi.object({ idCorporation: idCorporationSchema }), 'params'),
-        corporationController.showAllContactInfo
-    );
-
-    router.get('/corporation/contact/:idContact',
-        authAdmin,
-        validationHandler(Joi.object({ idContact: idContactSchema }), 'params'),
-        corporationController.showContactInfo
-    );
 
     router.post('/corporation/contact/new',
         authAdmin,
