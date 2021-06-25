@@ -96,9 +96,9 @@ exports.showLastUserTicket = async (req, res) => {
         const user = await User.findOne({ email });
 
         if (!user) {
-            return res.status(401).json({
+            return res.status(404).json({
                 success: false,
-                message: 'No se ha podido procesar la solicitud'
+                message: 'El usuario al que hace referencia no está disponible.'
             });
         }
 
@@ -106,11 +106,11 @@ exports.showLastUserTicket = async (req, res) => {
             { user: user._id })
             .populate('corporation', 'name rif image')
             .populate('status', 'name color');
-        
-            return res.status(200).json({
-                success: false,
-                lastTickets
-            });
+
+        return res.status(200).json({
+            success: false,
+            lastTickets
+        });
 
     } catch (error) {
         console.log(error)
@@ -128,6 +128,13 @@ exports.showWaitingTickets = async (req, res) => {
         const status = await Status.findOne({
             name: 'waiting'
         })
+
+        if (!status) {
+            return res.status(404).json({
+                success: true,
+                message:"La información a la que hace referencia no está disponible"
+            });
+        }
 
         const allTickets = await Ticket.find({
             status: status.id
