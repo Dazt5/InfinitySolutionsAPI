@@ -224,9 +224,20 @@ module.exports = () => {
 
     //* ADMIN TICKETS *//
 
+    router.get('/admin/ticket',
+        authAdmin,
+        ticketController.showAllTickets
+    );
+
     router.get('/ticket/status/waiting',
         authAdmin,
         ticketController.showWaitingTickets
+    );
+
+    router.patch('/ticket/:idTicket',
+        authAdmin,
+        validationHandler(Joi.object({ idTicket: idTicketSchema }), 'params'),
+        ticketController.changeTicketStatus
     );
 
     router.get('/user/profile/:userId',
@@ -241,12 +252,7 @@ module.exports = () => {
         userController.getUserByEmail
     );
 
-    //* ADMIN TICKETS */
-    router.patch('/ticket/:idTicket',
-        authAdmin,
-        validationHandler(Joi.object({ idTicket: idTicketSchema }), 'params'),
-        ticketController.changeTicketStatus
-    );
+
 
     //* CORPORATION */
     router.post('/corporation/new',

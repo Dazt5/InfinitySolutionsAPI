@@ -131,14 +131,35 @@ exports.showWaitingTickets = async (req, res) => {
 
         if (!status) {
             return res.status(404).json({
-                success: true,
-                message:"La información a la que hace referencia no está disponible"
+                success: false,
+                message: "La información a la que hace referencia no está disponible"
             });
         }
 
         const allTickets = await Ticket.find({
             status: status.id
         }).populate('corporation', 'name rif image');
+
+        return res.status(200).json({
+            success: true,
+            allTickets
+        });
+
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            success: false,
+            message: 'No se ha podido procesar la solicitud'
+        });
+    }
+}
+
+exports.showAllTickets = async (req, res) => {
+
+    try {
+
+        const allTickets = await Ticket.find()
+            .populate('corporation', 'name rif image');
 
         return res.status(200).json({
             success: true,

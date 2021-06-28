@@ -224,12 +224,12 @@ exports.deleteDocument = async (req, res) => {
 
 exports.sendDocument = async (req,res) => {
 
-    const { file} = req.params;
+    const {file} = req.params;
 
     try{
 
         const document = await Document.findOne({
-            file
+            _id:file
         });
 
         if(!document){
