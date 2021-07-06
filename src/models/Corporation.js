@@ -18,6 +18,15 @@ const corporationSchema = new Schema({
         trim: true,
         required: true
     },
+    type: {
+        type: String,
+        trim: true,
+    },
+    active: {
+        type: Number,
+        default:1
+        
+    },
     create_at: {
         type: Date,
         default: Date.now()

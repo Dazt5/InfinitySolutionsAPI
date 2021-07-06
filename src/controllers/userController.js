@@ -58,7 +58,7 @@ exports.changePassword = async (req, res) => {
 
 exports.changeProfile = async (req, res) => {
 
-    const { fullname, phone_number } = req.body;
+    const { name,lastname, phone_number } = req.body;
     const { email } = decodeToken(res.locals.token);
 
     try {
@@ -68,7 +68,8 @@ exports.changeProfile = async (req, res) => {
                 email
             },
             {
-                fullname,
+                name,
+                lastname,
                 phone_number
             });
 
@@ -95,7 +96,7 @@ exports.getUser = async (req, res) => {
 
         const user = await User.findOne({
             email
-        });
+        }).select('_id name lastname email phone_number auth_level last_access');
 
         if (!user) {
             return res.status(404).json({
@@ -119,13 +120,43 @@ exports.getUser = async (req, res) => {
 
 }
 
+exports.getAllUsers = async (req, res) => {
+    
+    try {
+        const users = await User.find({
+            auth_level:1
+        })
+            .select('_id name lastname email phone_number auth_level activated create_at last_access');
+        
+        if (!users) {
+            return res.status(404).json({
+                success: false,
+                message: "No se ha podido encontrar usuarios"
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            users
+        });
+
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({
+            success: false,
+            message: "Ha ocurrido un error inesperado..."
+        });
+    }
+
+} 
+
 exports.getUserById = async (req, res) => {
     const { userId } = req.params;
 
     try {
         const user = await User.findOne({
             _id: userId
-        });
+        }).select('_id name lastname email phone_number auth_level activated last_access');
 
         if (!user) {
             return res.status(404).json({
@@ -154,7 +185,7 @@ exports.getUserByEmail = async (req, res) => {
     try {
         const user = await User.findOne({
             email
-        });
+        }).select('_id name lastname email phone_number auth_level activated last_access');
 
         if (!user) {
             return res.status(404).json({

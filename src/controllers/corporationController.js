@@ -1,17 +1,14 @@
 /*MONGOOSE SCHEMAS*/
 const Corporation = require('../models/Corporation');
 const Contact = require('../models/Contact');
-const CorporationDocuments = require('../models/Document')
 
 const {
-    exist_route,
-    delete_file
+    exist_route
 } = require('../libs/files');
 const multer = require('multer');
 const shortid = require('shortid');
 
 const UPLOAD_ROUTE = '/../uploads/';
-const UPLOAD_ROUTE_DOCUMENT = '/../documents/';
 
 const configurationUploadPicture = {
     limits: { fileSize: 4096000 },
@@ -28,7 +25,7 @@ const configurationUploadPicture = {
     }),
     fileFilter(req, file, cb) {
 
-        const { name, rif } = req.body;
+        const { name, rif,type } = req.body;
 
         if (!name) {
             cb(new Error('Debe ingresar un nombre a la corporación'));
@@ -36,6 +33,10 @@ const configurationUploadPicture = {
 
         if (!rif) {
             cb(new Error('Debe ingresar un RIF'));
+        }
+
+        if (!type) {
+            cb(new Error('Debe seleccionar el tipo de la empresa'));
         }
 
         if (file.mimetype === 'image/jpeg' || file.mimetype === 'image/jpg' || file.mimetype === 'image/png') {
@@ -70,11 +71,12 @@ exports.uploadPicture = (req, res, next) => {
 
 exports.newCorporation = async (req, res) => {
 
-    const { name, rif } = req.body;
+    const { name, rif, type } = req.body;
 
     const corporation = new Corporation({
         name,
-        rif
+        rif,
+        type
     });
 
     try {
@@ -103,11 +105,9 @@ exports.newCorporation = async (req, res) => {
 
 exports.editCorporation = async (req, res) => {
 
-    console.log(req.body);
-
     const { idCorporation } = req.params;
 
-    const { name, rif } = req.body;
+    const { name, rif, type } = req.body;
 
     try {
         const Previouscorporation = await Corporation.findOne({ _id: idCorporation });
@@ -119,7 +119,7 @@ exports.editCorporation = async (req, res) => {
             });
         }
 
-        let newCorporation = { name, rif };
+        let newCorporation = { name, rif,type};
 
         if (req.file) {
 
@@ -138,10 +138,11 @@ exports.editCorporation = async (req, res) => {
             });
 
 
-        res.status(201).json({
+        return res.status(201).json({
             success: true,
             message: 'Empresa actualizado correctamente.'
         });
+
     } catch (error) {
         console.log(error);
         return res.status(500).json({
@@ -170,6 +171,42 @@ exports.deleteCorporation = async (req, res) => {
 
         });
     }
+}
+
+exports.desactivateCorporation = async (req, res) => {
+
+    const { idCorporation } = req.params;
+
+    try {
+        const corporation = await Corporation.findOne({
+            _id: idCorporation
+        });
+
+        if (!corporation) {
+            return res.status(404).json({
+                success: false,
+                message: 'La empresa ingresada no coincide con ninguna registrada'
+            });
+        }
+
+        corporation.active = !corporation.active;
+
+        await corporation.save();
+
+        return res.status(200).json({
+            success: true,
+            message: 'Modificada exitosamente'
+        });
+
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json({
+            success: false,
+            message: 'Ha ocurrido un error inespeado.'
+
+        });
+    }
+
 }
 
 exports.showAllCorporation = async (_, res) => {

@@ -22,6 +22,7 @@ const documentController = require('../controllers/documentController');
 const {
     signupSchema,
     loginSchema,
+    resendActivationSchema,
     recoverAccountSchema,
 } = require('../libs/schemas/authentication');
 
@@ -36,6 +37,7 @@ const {
 const {
     ticketSchema,
     idTicketSchema,
+    responseTicketSchema
 } = require('../libs/schemas/ticket');
 
 const {
@@ -83,6 +85,7 @@ module.exports = () => {
     );
 
     router.post('/recover',
+        validationHandler(resendActivationSchema),
         authController.sendRecoverToken
     );
 
@@ -120,6 +123,10 @@ module.exports = () => {
         ticketController.showAllUserTickets
     );
 
+    router.get('/lastTicket',
+        authUser
+    );
+
     router.get('/ticket/:idTicket',
         authUser,
         validationHandler(Joi.object({ idTicket: idTicketSchema }), 'params'),
@@ -132,10 +139,23 @@ module.exports = () => {
         ticketController.newTicket
     );
 
+    router.post('/ticket/:idTicket/response',
+        authUser,
+        validationHandler(Joi.object({ idTicket: idTicketSchema }), 'params'),
+        validationHandler(responseTicketSchema),
+        ticketController.addTicketResponse
+    );
+
+    router.get('/ticket/:idTicket/response',
+        authUser,
+        validationHandler(Joi.object({ idTicket: idTicketSchema }), 'params'),
+        ticketController.getTicketsResponse
+    );
+
     /*FAVORITES*/
     router.get('/favorite',
         authUser,
-        favoriteController.showFavorite
+        favoriteController.showFavorites
     );
 
     router.post('/favorite/new',
@@ -162,6 +182,21 @@ module.exports = () => {
         corporationController.showCorporation
     );
 
+
+    /*CORPORATION CONTACT INFORMATIÓN*/
+
+    router.get('/corporation/:idCorporation/contact',
+        authUser,
+        validationHandler(Joi.object({ idCorporation: idCorporationSchema }), 'params'),
+        corporationController.showAllContactInfo
+    );
+
+    router.get('/corporation/contact/:idContact',
+        authUser,
+        validationHandler(Joi.object({ idContact: idContactSchema }), 'params'),
+        corporationController.showContactInfo
+    );
+
     router.get('/corporation/:idCorporation/FAQ',
         authUser,
         validationHandler(Joi.object({ idCorporation: idCorporationSchema }), 'params'),
@@ -180,6 +215,20 @@ module.exports = () => {
 
     /*------- ADMIN ROUTES ---------*/
 
+    //GET ALL USERS //
+
+    router.get('/users',
+        authAdmin,
+        userController.getAllUsers
+    );
+
+    //* ADMIN TICKETS *//
+
+    router.get('/ticket/status/waiting',
+        authAdmin,
+        ticketController.showWaitingTickets
+    );
+
     router.get('/user/profile/:userId',
         authAdmin,
         validationHandler(Joi.object({ userId: idUserSchema }), 'params'),
@@ -190,6 +239,13 @@ module.exports = () => {
         authAdmin,
         validationHandler(Joi.object({ email: userEmailSchema }), 'params'),
         userController.getUserByEmail
+    );
+
+    //* ADMIN TICKETS */
+    router.patch('/ticket/:idTicket',
+        authAdmin,
+        validationHandler(Joi.object({ idTicket: idTicketSchema }), 'params'),
+        ticketController.changeTicketStatus
     );
 
     //* CORPORATION */
@@ -210,6 +266,12 @@ module.exports = () => {
         authAdmin,
         validationHandler(Joi.object({ idCorporation: idCorporationSchema }), 'params'),
         corporationController.deleteCorporation
+    );
+
+    router.patch('/desactivate/corporation/:idCorporation',
+        authAdmin,
+        validationHandler(Joi.object({ idCorporation: idCorporationSchema }), 'params'),
+        corporationController.desactivateCorporation
     );
 
     /* CORPORATION DOCUMENTS */
@@ -246,18 +308,6 @@ module.exports = () => {
     );
 
     /*CORPORATION CONTACT INFORMATIÓN*/
-
-    router.get('/corporation/:idCorporation/contact',
-        authAdmin,
-        validationHandler(Joi.object({ idCorporation: idCorporationSchema }), 'params'),
-        corporationController.showAllContactInfo
-    );
-
-    router.get('/corporation/contact/:idContact',
-        authAdmin,
-        validationHandler(Joi.object({ idContact: idContactSchema }), 'params'),
-        corporationController.showContactInfo
-    );
 
     router.post('/corporation/contact/new',
         authAdmin,

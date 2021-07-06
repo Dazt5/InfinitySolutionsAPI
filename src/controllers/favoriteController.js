@@ -1,12 +1,11 @@
 /*MONGOOSE SCHEMAS*/
-const mongoose = require('mongoose');
 const Favorite = require('../models/Favorite');
 const User = require('../models/User');
 
 /* LIBS */
 const { decodeToken } = require('../libs/authToken');
 
-exports.showFavorite = async (_, res) => {
+exports.showFavorites = async (_, res) => {
 
     const { email } = decodeToken(res.locals.token);
 
@@ -24,7 +23,7 @@ exports.showFavorite = async (_, res) => {
 
         const favorite = await Favorite.find({
             user: user.id
-        }).populate('user').populate('corporation');
+        })/*.populate('user')*/.populate('corporation', '_id name rif image');
 
         if (!favorite) {
             return res.status(404).json({

@@ -1,4 +1,4 @@
-require('dotenv').config({ path: '.env' });
+const {config} = require('../config/index')
 
 /*MONGOOSE SCHEMAS*/
 const User = require('../models/User');
@@ -42,18 +42,18 @@ exports.signUp = async (req, res) => {
         user.activatedToken = randomBytes(20).toString('hex');
         user.activatedExpirationToken = Date.now() + (3600 * 1000 * 24);
 
-        await user.save();
-
         sendEmail.send({
             email: user.email,
             subject: 'Confirma tu cuenta',
             view: 'confirmAccount',
-            url: `http://${process.env.HOST}:${process.env.PORT}/activate/${user.activatedToken}`
+            url: `http://${config.frontServer}/activate/${user.activatedToken}`
         });         //TODO: FRONT URL FOR EMAIL 
+
+        await user.save();
 
         res.status(200).json({
             success: true,
-            message: 'Usuario creado satisfactoriamente'
+            message: 'Usuario creado satisfactoriamente, hemos enviado a su correo un enlace para activar su cuenta'
         });
 
     } catch (error) {
@@ -65,7 +65,6 @@ exports.signUp = async (req, res) => {
 }
 
 /*      LOGIN       */
-
 exports.login = async (req, res) => {
 
     const { email, password } = req.body;
@@ -114,23 +113,15 @@ exports.login = async (req, res) => {
 exports.sendActivatedToken = async (req, res) => {
 
     const { email } = req.body;
-
-    if (!validate.Email(email)) {
-        return res.status(400).json({
-            success: false,
-            message: 'Formato de Email no válido'
-        });
-    }
-
     try {
         const user = await User.findOne({
             email
         });
 
         if (!user) {
-            return res.status(404).json({
-                success: false,
-                message: 'El email no coincide con un usuario registrado'
+            return res.status(200).json({
+                success: true,
+                message: 'Si el email es correcto, encontrará el link para activar su cuenta'
             });
         }
 
@@ -150,8 +141,8 @@ exports.sendActivatedToken = async (req, res) => {
             email: user.email,
             subject: 'Confirma tu cuenta',
             view: 'confirmAccount',
-            url: `http://${process.env.HOST}:${process.env.PORT}/activate/${user.activatedToken}`
-        });         //TODO: FRONT URL
+            url: `http://${config.frontServer}/activate/${user.activatedToken}`
+        });         
 
         return res.status(200).json({
             success: true,
@@ -169,7 +160,6 @@ exports.sendActivatedToken = async (req, res) => {
 exports.activateAccount = async (req, res) => {
 
     const { token } = req.params;
-
     try {
         const user = await User.findOne({
             activatedToken: token,
@@ -215,9 +205,9 @@ exports.sendRecoverToken = async (req, res) => {
         });
 
         if (!user) {
-            return res.status(404).json({
-                success: false,
-                message: 'El email ingresado no está registrado.'
+            return res.status(200).json({
+                success: true,
+                message: 'Si el email es correcto, encontrará el link para activar su cuenta'
             });
         }
 
@@ -230,12 +220,12 @@ exports.sendRecoverToken = async (req, res) => {
             email: user.email,
             subject: 'Recupera tu contraseña',
             view: 'recoverAccount',
-            url: `http://${process.env.HOST}:${process.env.PORT}/recover/${user.recoveryToken}`
-        });             //TODO: FRONT URL
+            url: `http://${config.frontServer}/recover/${user.recoveryToken}`
+        });             
 
         return res.status(200).json({
             success: true,
-            message: 'Se ha envíado el correo de recuperación'
+            message: 'Si el email es correcto, encontrará el link para activar su cuenta'
         });
     } catch (error) {
         return res.status(500).json({
