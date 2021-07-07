@@ -25,7 +25,7 @@ exports.showAllUserTickets = async (_, res) => {
         const ticket = await Ticket.find(
             { user: user._id })
             .populate('corporation', 'name rif image')
-            .populate('status', 'name color');
+            .populate('status', 'name');
 
         if (!ticket) {
             return res.status(401).json({
@@ -66,7 +66,7 @@ exports.showUserTicket = async (req, res) => {
             })
             .populate('user', '_id name lastname email phone_number auth_level activated last_access')
             .populate('corporation', 'name rif image')
-            .populate('status', 'name color');
+            .populate('status', 'name');
 
         if (!ticket) {
             return res.status(404).json({
@@ -103,9 +103,10 @@ exports.showLastUserTicket = async (req, res) => {
         }
 
         const lastTickets = await Ticket.find(
+            
             { user: user._id })
             .populate('corporation', 'name rif image')
-            .populate('status', 'name color');
+            .populate('status', 'name');
 
         return res.status(200).json({
             success: false,
@@ -127,7 +128,7 @@ exports.showWaitingTickets = async (req, res) => {
 
         const status = await Status.findOne({
             name: 'waiting'
-        })
+        }).populate('status', 'name')
 
         if (!status) {
             return res.status(404).json({
@@ -158,12 +159,12 @@ exports.showAllTickets = async (req, res) => {
 
     try {
 
-        const allTickets = await Ticket.find()
-            .populate('corporation', 'name rif image');
+        const tickets = await Ticket.find()
+            .populate('corporation', 'name rif image').populate('status', 'name');
 
         return res.status(200).json({
             success: true,
-            allTickets
+            tickets
         });
 
     } catch (error) {
