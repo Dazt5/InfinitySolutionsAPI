@@ -14,10 +14,6 @@ const statusSchema = Joi.object({
         'string.min': 'El nombre debe tener como minimo 4 caracteres',
         'string.empty': 'El nombre no debe ir vacio'
     }),
-    color: Joi.string().required().messages({
-        'any.required': 'Debe elegir un color',
-        'string.empty': 'Debe elegir un color'
-    }),
     default: Joi.boolean().optional().messages({
         'any.required': 'Debe seleccionar si el status será el default',
         'string.empty': 'Debe seleccionar si el status será el default'

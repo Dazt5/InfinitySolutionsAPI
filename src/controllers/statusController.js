@@ -1,26 +1,6 @@
 /*MONGOOSE SCHEMAS*/
 const Status = require('../models/Status');
 
-exports.validateStatus = (req, res, next) => {
-
-    const { name, color } = req.body;
-
-    if (!name) {
-        return res.status(400).json({
-            success: false,
-            message: 'El nombre no puede ir vácio.'
-        });
-    } else if (!color) {
-
-        return res.status(400).json({
-            success: false,
-            message: 'Tiene que seleccionar un color'
-        });
-    }
-
-    next();
-}
-
 exports.getStatuses = async (req,res) =>{
 
     try{
@@ -97,7 +77,7 @@ exports.newStatus = async (req, res) => {
         console.log(error);
         return res.status(500).json({
             success: false,
-            message: error
+            message: 'Ha ocurrido un error inesperado'
         });
     }
 

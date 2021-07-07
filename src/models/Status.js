@@ -9,11 +9,6 @@ const statusSchema = new Schema({
         trim: true,
         required: true,
     },
-    color: {
-        type: String,
-        trim: true,
-        required: true
-    },
     default: {
         type: Number,
     },
