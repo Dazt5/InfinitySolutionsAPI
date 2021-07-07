@@ -223,6 +223,7 @@ module.exports = () => {
 
     router.post('/admin',
         authAdmin,
+        validationHandler(signupSchema),
         userController.createAdmin
     )
 
