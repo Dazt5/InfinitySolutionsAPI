@@ -215,12 +215,16 @@ module.exports = () => {
 
     /*------- ADMIN ROUTES ---------*/
 
-    //GET ALL USERS //
-
+    //USERS
     router.get('/users',
         authAdmin,
         userController.getAllUsers
     );
+
+    router.post('/admin',
+        authAdmin,
+        userController.createAdmin
+    )
 
     //* ADMIN TICKETS *//
 
@@ -251,8 +255,6 @@ module.exports = () => {
         validationHandler(Joi.object({ email: userEmailSchema }), 'params'),
         userController.getUserByEmail
     );
-
-
 
     //* CORPORATION */
     router.post('/corporation/new',
@@ -362,7 +364,6 @@ module.exports = () => {
         faqController.deleteFaq
     );
 
-
     /*STATUS*/
 
     router.get('/status',
@@ -379,7 +380,6 @@ module.exports = () => {
     router.post('/status/new',
         authAdmin,
         validationHandler(statusSchema),
-        statusController.validateStatus,
         statusController.newStatus
     );
 
