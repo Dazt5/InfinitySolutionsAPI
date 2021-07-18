@@ -406,7 +406,7 @@ exports.getTicketsResponse = async (req, res) => {
 
         const ticketResponse = await TicketResponse.find({
             ticket: idTicket
-        }).sort({ create_at: 'asc' }).populate('User', '_id name lastname email auth_level')
+        }).sort({ create_at: 'asc' }).populate('user', '_id name lastname email auth_level')
 
         return res.status(200).json({
             success: true,
