@@ -102,7 +102,7 @@ exports.sendMessage = async (req, res) => {
 
         const messages = await Messages.find({
             room: room._id
-        }).populate('User')
+        }).populate('user')
 
         socket.io.emit("messages", messages);
 
