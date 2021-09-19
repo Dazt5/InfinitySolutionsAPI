@@ -14,7 +14,7 @@ const messagesSchema = new Schema({
 
     message: {
         type: String,
-        trim:true,
+        trim: true,
     },
 
     create_at: {
