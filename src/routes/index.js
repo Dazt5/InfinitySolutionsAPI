@@ -58,6 +58,10 @@ const {
     statusSchema
 } = require('../libs/schemas/status');
 
+const {
+    idMessageAndRoomSchema,
+} = require('../libs/schemas/chat');
+
 /**VALIDATION HANDLER*/
 const validationHandler = require('../middlewares/validationHandler');
 
@@ -394,6 +398,27 @@ module.exports = () => {
         authAdmin,
         validationHandler(Joi.object({ idStatus: idStatusSchema }), 'params'),
         statusController.deleteStatus
+    );
+
+    /*CHAT*/
+
+    //Get all rooms
+    router.get('/admin/chat/room',
+        authAdmin,
+        chatController.getRooms
+    );
+
+    //Get messages in the room
+    router.get('/admin/chat/:idRoom',
+        authAdmin,
+        validationHandler(Joi.object({ idRoom: idMessageAndRoomSchema }), 'params'),
+        chatController.getMessagesInRoom
+    );
+    
+    router.post('/admin/chat/:idRoom',
+        authAdmin,
+        validationHandler(Joi.object({ idRoom: idMessageAndRoomSchema }), 'params'),
+        chatController.sendMessageToTheRoom
     );
 
     return router;

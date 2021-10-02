@@ -12,6 +12,11 @@ const roomSchema = new Schema({
         type: Date,
         default: Date.now()
     },
+
+    last_message: {
+        type: Schema.ObjectId,
+        ref: 'Messages'
+    },
 })
 
 module.exports = mongoose.model('Room', roomSchema);
