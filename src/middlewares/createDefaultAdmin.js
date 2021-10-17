@@ -48,7 +48,7 @@ const createDefaultStatus = async () => {
         }
 
         const rejectedStatus = await Status.findOne({
-            name:"reject"
+            name:"rejected"
         })
 
         if (!rejectedStatus) {
