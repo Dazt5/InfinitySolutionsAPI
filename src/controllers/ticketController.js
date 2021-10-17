@@ -102,14 +102,12 @@ exports.showLastUserTicket = async (req, res) => {
             });
         }
 
-        const lastTickets = await Ticket.find(
-            
-            { user: user._id })
+        const lastTickets = await Ticket.find({ user: user._id })
             .populate('corporation', 'name rif image')
             .populate('status', 'name');
 
         return res.status(200).json({
-            success: false,
+            success: true,
             lastTickets
         });
 

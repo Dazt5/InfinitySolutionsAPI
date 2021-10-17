@@ -52,5 +52,5 @@ module.exports = {
     userEmailSchema,
     idUserSchema,
     changePasswordSchema,
-    changeProfileSchema
+    changeProfileSchema,
 }

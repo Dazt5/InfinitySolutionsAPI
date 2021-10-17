@@ -1,4 +1,5 @@
 const User = require('../models/User');
+const Ticket = require('../models/Tickets');
 
 /*  HELPERS AND LIBS    */
 const { decodeToken } = require('../libs/authToken');
@@ -263,4 +264,48 @@ exports.createAdmin = async (req, res) => {
         });
     }
 
+}
+
+exports.getAdminResume = async (req, res) => {
+    try {
+
+        const tickets = await Ticket.find({
+        }).populate("status");
+
+        const userExist = await User.find({
+            create_at: {$lt: Date.now()}
+        }).count();
+
+        let waiting, success;
+
+        tickets.map(ticket => {
+            if (ticket.status.name == "success") {
+                console.log("entré aquí en success")
+                success += 1;
+            } else if (ticket.status.name == "waiting") {
+                console.log("entré aquí en waiting")
+                waiting += 1;
+            }
+        })
+        
+        const resume = {
+            users: userExist,
+            tickets: {
+                waiting,
+                success
+            }
+        }
+
+        return res.status(200).json({
+            success: true,
+            resume
+        });
+
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({
+            success: false,
+            message: 'No se ha podido procesar la solicitud'
+        });
+    }
 }

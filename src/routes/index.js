@@ -231,6 +231,12 @@ module.exports = () => {
         userController.createAdmin
     )
 
+    /* ADMIN DASHBOARD */
+    router.get('/admin/dashboard',
+        authAdmin,
+        userController.getAdminResume
+    )
+
     //* ADMIN TICKETS *//
 
     router.get('/admin/ticket',
