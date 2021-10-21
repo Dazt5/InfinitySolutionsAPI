@@ -2,7 +2,97 @@ const User = require('../models/User');
 const Room = require('../models/Room');
 const Messages = require('../models/Messages');
 const { decodeToken } = require('../libs/authToken');
-const { socket } = require('../libs/socket')
+const { socket } = require('../libs/socket');
+const Tickets = require('../models/Tickets');
+const { populate } = require('../models/User');
+
+exports.activateRoom = async (req, res) => {
+    const { idTicket } = req.params;
+
+    try {
+        const ticket = await Tickets.findOne({
+            _id: idTicket
+        })
+
+        if (!ticket) {
+            return res.status(404).json({
+                success: false,
+                message: 'El ticket que quiere elevar no está disponible'
+            });
+        }
+
+        const room = await Room.findOne({
+            user: ticket.user._id,
+        });
+
+        if (!room) {
+            console.log("La room no existe, vamo a crearla");
+            const newRoom = new Room({
+                user: ticket.user._id,
+                last_message: null,
+                activated: 1,
+                activate_for_ticket: ticket._id
+            });
+
+            await newRoom.save();
+
+            return res.status(201).json({
+                success: true,
+                message: 'Se ha activado la sala de chat'
+            });
+        } else if (room.activated == 0) {
+            console.log("La room si existe, entonces vamos a activarla")
+            room.activated = 1;
+            await room.save();
+
+            return res.status(201).json({
+                success: true,
+                message: 'Se ha activado la sala de chat'
+            });
+        } else if (room.activated == 1) {
+            return res.status(409).json({
+                success: false,
+                message: 'La sala de chat ya se encuentra activada.'
+            });
+        }
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({
+            success: false,
+            message: 'Ha ocurrido un error inesperado'
+        });
+    }
+}
+
+exports.desactivateRoom = async (req, res) => {
+
+    const { idRoom } = req.params;
+
+    const room = await Room.findOne({
+        _id: idRoom
+    });
+
+    if (!room) {
+        return res.status(404).json({
+            success: false,
+            message: 'La sala de chat no está disponible.'
+        });
+    } else if (room.activated == 0) {
+        return res.status(409).json({
+            success: false,
+            message: 'La sala de chat ya está desactivada.'
+        });
+    } else if (room.activated == 1) {
+        room.activated = 0;
+        await room.save();
+
+        return res.status(200).json({
+            success: true,
+            message: 'La sala de chat ya se ha desactivado.'
+        });
+    }
+
+}
 
 exports.joinChat = async (req, res) => {
     const { email } = decodeToken(res.locals.token);
@@ -20,29 +110,15 @@ exports.joinChat = async (req, res) => {
         }
 
         const room = await Room.findOne({
-            user: user._id
+            user: user._id,
+            activated: 1
         });
 
         if (!room) {
-            //if not exist a room, create a room
-            const newRoom = new Room();
-            newRoom.user = user._id;
-
-            await newRoom.save();
-
-            const room = await Room.findOne({
-                user: user._id
-            });
-
-            const messages = await Messages.find({
-                room: room._id
-            }).populate('user');
-
-            socket.io.emit('messages', messages);
-
-            return res.status(200).json({
-                success: true,
-                messages
+            //socket.io.emit('messages', messages);
+            return res.status(404).json({
+                success: false,
+                message: 'Su sala de chat no está activada.'
             })
         }
 
@@ -51,7 +127,7 @@ exports.joinChat = async (req, res) => {
             room: room._id
         }).populate('user');
 
-        socket.io.emit('messages', messages);
+        //socket.io.emit('messages', messages);
 
         return res.status(200).json({
             success: true,
@@ -70,7 +146,6 @@ exports.joinChat = async (req, res) => {
 exports.sendMessage = async (req, res) => {
 
     const { message } = req.body;
-
     const { email } = decodeToken(res.locals.token);
 
     try {
@@ -86,25 +161,15 @@ exports.sendMessage = async (req, res) => {
         }
 
         let room = await Room.findOne({
-            user: user._id
+            user: user._id,
+            activated: 1
         });
 
         if (!room) {
-            const newRoom = new Room();
-            newRoom.user = user._id;
-
-            await newRoom.save();
-
-            room = await Room.findOne({
-                user: user._id
+            return res.status(404).json({
+                success: false,
+                message: 'Su sala de chat no está activada.'
             });
-
-            if (!room) {
-                return res.status(404).json({
-                    success: false,
-                    message: 'Su sala de chat no se encuentra disponible'
-                });
-            }
         }
 
         const newMessage = new Messages({ message, user: user._id, room: room._id });
@@ -117,7 +182,7 @@ exports.sendMessage = async (req, res) => {
             room: room._id
         })
 
-        socket.io.emit("messages", messages);
+        //socket.io.emit("messages", messages);
 
         return res.status(201).json({
             success: true,
@@ -136,9 +201,14 @@ exports.sendMessage = async (req, res) => {
 exports.getRooms = async (_, res) => {
 
     try {
-        const rooms = await Room.find()
+        const rooms = await Room.find({
+            activated: 1
+        })
             .populate('user', '_id name lastname email auth_level')
-            .populate('last_message')
+            .populate({
+                path: 'last_message',
+                populate: { path: 'user' }
+            })
             .sort({ create_at: 'asc' });
 
         if (!rooms) {
@@ -168,15 +238,17 @@ exports.getMessagesInRoom = async (req, res) => {
 
     try {
 
-        const room = await Room.findOne({ _id: idRoom });
+        const room = await Room.findOne({
+            _id: idRoom,
+            activated: 1
+        });
 
         if (!room) {
-            if (!rooms) {
-                return res.status(404).json({
-                    success: false,
-                    message: 'La sala de chat a la que hace referencia no existe.'
-                });
-            }
+            return res.status(404).json({
+                success: false,
+                message: 'La sala de chat a la que hace referencia no existe.'
+            });
+
         }
 
         const messages = await Messages.find({
@@ -216,8 +288,6 @@ exports.sendMessageToTheRoom = async (req, res) => {
     const { email } = decodeToken(res.locals.token);
 
     try {
-
-
         const user = await User.findOne({
             email
         });
@@ -232,15 +302,13 @@ exports.sendMessageToTheRoom = async (req, res) => {
         const room = await Room.findOne({ _id: idRoom });
 
         if (!room) {
-            if (!rooms) {
-                return res.status(404).json({
-                    success: false,
-                    message: 'La sala de chat a la que hace referencia no existe.'
-                });
-            }
+            return res.status(404).json({
+                success: false,
+                message: 'La sala de chat a la que hace referencia no existe.'
+            });
         }
 
-        const message = new Messages({message:newMessage});
+        const message = new Messages({ message: newMessage });
 
         message.room = room._id;
         message.user = user._id;

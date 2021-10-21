@@ -17,6 +17,16 @@ const roomSchema = new Schema({
         type: Schema.ObjectId,
         ref: 'Messages'
     },
+
+    activated: {
+        type: Number,
+        default: 0
+    },
+
+    activate_for_ticket: {
+        type: Schema.ObjectId,
+        ref: 'Tickets'
+    }
 })
 
 module.exports = mongoose.model('Room', roomSchema);

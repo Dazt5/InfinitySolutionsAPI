@@ -406,7 +406,21 @@ module.exports = () => {
         statusController.deleteStatus
     );
 
-    /*CHAT*/
+    /**** CHAT ****/
+
+    //Activate room
+    router.post('/admin/chat/activate/:idTicket',
+        authAdmin,
+        validationHandler(Joi.object({ idTicket: idTicketSchema }), 'params'),
+        chatController.activateRoom
+    );
+
+    //Desactivate room
+    router.post('/admin/chat/desactivate/:idRoom',
+        authAdmin,
+        validationHandler(Joi.object({ idRoom: idMessageAndRoomSchema }), 'params'),
+        chatController.desactivateRoom
+    );
 
     //Get all rooms
     router.get('/admin/chat/room',
@@ -420,7 +434,7 @@ module.exports = () => {
         validationHandler(Joi.object({ idRoom: idMessageAndRoomSchema }), 'params'),
         chatController.getMessagesInRoom
     );
-    
+
     router.post('/admin/chat/:idRoom',
         authAdmin,
         validationHandler(Joi.object({ idRoom: idMessageAndRoomSchema }), 'params'),
