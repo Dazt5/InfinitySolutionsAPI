@@ -168,9 +168,9 @@ module.exports = () => {
         favoriteController.addFavorite
     );
 
-    router.delete('/favorite/:idFavorite',
+    router.delete('/favorite/:idCorporation',
         authUser,
-        validationHandler(Joi.object({ idFavorite: idFavoriteSchema }), 'params'),
+        validationHandler(Joi.object({ idCorporation: idCorporationSchema }), 'params'),
         favoriteController.deleteFavorite
     );
 

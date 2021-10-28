@@ -63,7 +63,19 @@ exports.addFavorite = async (req, res) => {
 
     const idUser = user._id;
 
-    const favorite = Favorite(
+    const Existfavorite = Favorite.findOne({
+        corporation: idCorporation,
+        user: idUser
+    })
+
+    if (Existfavorite) {
+        return res.status(409).json({
+            success: false,
+            message: 'La compañia ya se encuentra en favoritos'
+        });
+    }
+
+    const favorite = new Favorite(
         {
             corporation: idCorporation,
             user: idUser,
@@ -86,8 +98,8 @@ exports.addFavorite = async (req, res) => {
 }
 
 exports.deleteFavorite = async (req, res) => {
-
-    const { idFavorite } = req.params;
+    const { email } = decodeToken(res.locals.token);
+    const { idCorporation } = req.params;
 
     try {
         const user = await User.findOne(
@@ -102,11 +114,25 @@ exports.deleteFavorite = async (req, res) => {
             });
         }
 
+        const Existfavorite = await Favorite.findOne({
+            corporation: idCorporation,
+            user: user._id
+        })
+
+        if (!Existfavorite) {
+            return res.status(404).json({
+                success: false,
+                message: 'El favorito al que hace referencia no existe.'
+            });
+        }
+
+        console.log(Existfavorite);
+
         await Favorite.findOneAndDelete({
-            _id: idFavorite,
+            _id: Existfavorite._id,
         });
 
-        res.status(200).json({
+        return res.status(200).json({
             success: true,
             message: 'El favorito fue eliminado'
         })
