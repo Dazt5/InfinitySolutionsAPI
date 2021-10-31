@@ -103,7 +103,6 @@ module.exports = () => {
     );
 
     /*USER*/
-
     router.get('/user',
         authUser,
         userController.getUser
@@ -119,6 +118,12 @@ module.exports = () => {
         authUser,
         validationHandler(changeProfileSchema),
         userController.changeProfile
+    );
+
+    /* ADMIN DASHBOARD */
+    router.get('/user/dashboard',
+        authUser,
+        userController.getUserResume
     );
 
     /*TICKETS*/
