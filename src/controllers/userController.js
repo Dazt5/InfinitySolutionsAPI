@@ -273,24 +273,74 @@ exports.getAdminResume = async (req, res) => {
         }).populate("status");
 
         const userExist = await User.find({
-            create_at: {$lt: Date.now()}
+            create_at: { $lt: Date.now() }
         }).count();
 
-        let waiting, success;
+        let waiting = 0, success = 0;
 
         tickets.map(ticket => {
             if (ticket.status.name == "success") {
-                console.log("entré aquí en success")
                 success += 1;
             } else if (ticket.status.name == "waiting") {
-                console.log("entré aquí en waiting")
                 waiting += 1;
             }
         })
-        
+
+        total = tickets.length;
+
         const resume = {
             users: userExist,
             tickets: {
+                total,
+                waiting,
+                success
+            }
+        }
+
+        return res.status(200).json({
+            success: true,
+            resume
+        });
+
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({
+            success: false,
+            message: 'No se ha podido procesar la solicitud'
+        });
+    }
+}
+
+exports.getUserResume = async (req, res) => {
+   
+    const { email } = decodeToken(res.locals.token);
+
+    try {
+
+        const user = await User.findOne({
+            email
+        });
+
+        const tickets = await Ticket.find({
+            user: user._id
+        }).populate("status");
+
+
+        let waiting = 0, success = 0;
+
+        tickets.map(ticket => {
+            if (ticket.status.name == "success") {
+                success += 1;
+            } else if (ticket.status.name == "waiting") {
+                waiting += 1;
+            }
+        })
+
+        total = tickets.length;
+
+        const resume = {
+            tickets: {
+                total,
                 waiting,
                 success
             }
