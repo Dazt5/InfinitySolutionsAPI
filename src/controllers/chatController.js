@@ -4,7 +4,6 @@ const Messages = require('../models/Messages');
 const { decodeToken } = require('../libs/authToken');
 const { socket } = require('../libs/socket');
 const Tickets = require('../models/Tickets');
-const { populate } = require('../models/User');
 
 exports.activateRoom = async (req, res) => {
     const { idTicket } = req.params;
@@ -26,7 +25,6 @@ exports.activateRoom = async (req, res) => {
         });
 
         if (!room) {
-            console.log("La room no existe, vamo a crearla");
             const newRoom = new Room({
                 user: ticket.user._id,
                 last_message: null,
@@ -36,16 +34,15 @@ exports.activateRoom = async (req, res) => {
 
             await newRoom.save();
 
-            return res.status(201).json({
+            res.status(201).json({
                 success: true,
                 message: 'Se ha activado la sala de chat'
             });
         } else if (room.activated == 0) {
-            console.log("La room si existe, entonces vamos a activarla")
             room.activated = 1;
             await room.save();
 
-            return res.status(201).json({
+            res.status(201).json({
                 success: true,
                 message: 'Se ha activado la sala de chat'
             });
@@ -55,6 +52,20 @@ exports.activateRoom = async (req, res) => {
                 message: 'La sala de chat ya se encuentra activada.'
             });
         }
+
+        const rooms = await Room.find({
+            activated: 1
+        })
+            .populate('user', '_id name lastname email auth_level')
+            .populate({
+                path: 'last_message',
+                populate: { path: 'user' }
+            })
+            .sort({ create_at: 'asc' });
+
+
+        return socket.io.emit("salas", rooms);
+
     } catch (error) {
         console.log(error)
         return res.status(500).json({
@@ -85,6 +96,18 @@ exports.desactivateRoom = async (req, res) => {
     } else if (room.activated == 1) {
         room.activated = 0;
         await room.save();
+
+        const rooms = await Room.find({
+            activated: 1
+        })
+            .populate('user', '_id name lastname email auth_level')
+            .populate({
+                path: 'last_message',
+                populate: { path: 'user' }
+            })
+            .sort({ create_at: 'asc' });
+
+        socket.io.emit("salas", rooms);
 
         return res.status(200).json({
             success: true,
