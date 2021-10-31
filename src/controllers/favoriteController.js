@@ -63,7 +63,7 @@ exports.addFavorite = async (req, res) => {
 
     const idUser = user._id;
 
-    const Existfavorite = Favorite.findOne({
+    const Existfavorite = await Favorite.findOne({
         corporation: idCorporation,
         user: idUser
     })
@@ -125,8 +125,6 @@ exports.deleteFavorite = async (req, res) => {
                 message: 'El favorito al que hace referencia no existe.'
             });
         }
-
-        console.log(Existfavorite);
 
         await Favorite.findOneAndDelete({
             _id: Existfavorite._id,
