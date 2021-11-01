@@ -246,10 +246,10 @@ exports.createAdmin = async (req, res) => {
 
         sendEmail.send({
             email: user.email,
-            subject: 'Recupera tu contraseña',
-            view: 'recoverAccount',
-            url: `http://${config.frontServer}/recover/${user.activatedToken}`
-        });
+            subject: 'Confirma tu cuenta',
+            view: 'confirmAccount',
+            url: `http://${config.frontServer}/activate/${user.activatedToken}`
+        });  
 
         return res.status(200).json({
             success: true,
@@ -358,4 +358,34 @@ exports.getUserResume = async (req, res) => {
             message: 'No se ha podido procesar la solicitud'
         });
     }
+}
+
+exports.getAllAdmins = async (req, res) => {
+
+    try {
+        const users = await User.find({
+            auth_level: 2
+        })
+            .select('_id name lastname email phone_number auth_level activated create_at last_access');
+
+        if (!users) {
+            return res.status(404).json({
+                success: false,
+                message: "No se ha podido encontrar usuarios"
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            users
+        });
+
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({
+            success: false,
+            message: "Ha ocurrido un error inesperado..."
+        });
+    }
+
 }

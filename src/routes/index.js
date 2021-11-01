@@ -234,7 +234,13 @@ module.exports = () => {
         authAdmin,
         validationHandler(signupSchema),
         userController.createAdmin
-    )
+    );
+
+        //USERS
+        router.get('/admins',
+        authAdmin,
+        userController.getAllAdmins
+    );
 
     /* ADMIN DASHBOARD */
     router.get('/admin/dashboard',
