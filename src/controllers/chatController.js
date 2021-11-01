@@ -61,8 +61,7 @@ exports.activateRoom = async (req, res) => {
                 path: 'last_message',
                 populate: { path: 'user' }
             })
-            .sort({ create_at: 'asc' });
-
+            .sort({last_message_at : '-1'});
 
         return socket.io.emit("salas", rooms);
 
@@ -95,6 +94,11 @@ exports.desactivateRoom = async (req, res) => {
         });
     } else if (room.activated == 1) {
         room.activated = 0;
+
+        await Messages.deleteMany({
+            room: room._id
+        })
+
         await room.save();
 
         const rooms = await Room.find({
@@ -105,7 +109,7 @@ exports.desactivateRoom = async (req, res) => {
                 path: 'last_message',
                 populate: { path: 'user' }
             })
-            .sort({ create_at: 'asc' });
+            .sort({last_message_at: '-1'});
 
         socket.io.emit("salas", rooms);
 
@@ -138,7 +142,6 @@ exports.joinChat = async (req, res) => {
         });
 
         if (!room) {
-            //socket.io.emit('messages', messages);
             return res.status(404).json({
                 success: false,
                 message: 'Su sala de chat no está activada.'
@@ -150,12 +153,13 @@ exports.joinChat = async (req, res) => {
             room: room._id
         }).populate('user');
 
-        //socket.io.emit('messages', messages);
-
-        return res.status(200).json({
+        res.status(200).json({
             success: true,
-            messages
+            messages,
+            room
         })
+
+        return socket.io.emit(`room-${room._id}`, messages);
 
     } catch (error) {
         console.log(error)
@@ -199,18 +203,31 @@ exports.sendMessage = async (req, res) => {
         await newMessage.save();
 
         room.last_message = newMessage._id;
+        room.last_message_at = Date.now();
         await room.save();
 
-        const messages = await Messages.find({
-            room: room._id
-        })
-
-        //socket.io.emit("messages", messages);
-
-        return res.status(201).json({
+        res.status(201).json({
             success: true,
             message: 'Mensaje creado satisfactoriamente '
         });
+
+        const messages = await Messages.find({
+            room: room._id
+        }).populate('user');
+
+        socket.io.emit(`room-${room._id}`, messages);
+
+        const rooms = await Room.find({
+            activated: 1
+        })
+            .populate('user', '_id name lastname email auth_level')
+            .populate({
+                path: 'last_message',
+                populate: { path: 'user' }
+            })
+            .sort({last_message_at: '-1'});
+
+        return socket.io.emit("salas", rooms);
 
     } catch (error) {
         console.log(error)
@@ -232,7 +249,7 @@ exports.getRooms = async (_, res) => {
                 path: 'last_message',
                 populate: { path: 'user' }
             })
-            .sort({ create_at: 'asc' });
+            .sort({last_message_at: '-1'});
 
         if (!rooms) {
             return res.status(404).json({
@@ -241,10 +258,11 @@ exports.getRooms = async (_, res) => {
             });
         }
 
-        return res.status(200).json({
+        res.status(200).json({
             success: true,
             rooms
         });
+        return socket.io.emit("salas", rooms);
 
     } catch (error) {
         console.log(error)
@@ -261,7 +279,7 @@ exports.getMessagesInRoom = async (req, res) => {
 
     try {
 
-        const room = await Room.findOne({
+        let room = await Room.findOne({
             _id: idRoom,
             activated: 1
         });
@@ -285,12 +303,24 @@ exports.getMessagesInRoom = async (req, res) => {
             });
         }
 
-        socket.io.emit('RoomMessages', messages);
-
-        return res.status(200).json({
+        res.status(200).json({
             success: true,
             messages
         });
+
+        socket.io.emit(`room-${room._id}`, messages);
+
+        const rooms = await Room.find({
+            activated: 1
+        })
+            .populate('user', '_id name lastname email auth_level')
+            .populate({
+                path: 'last_message',
+                populate: { path: 'user' }
+            })
+            .sort({last_message_at: '-1'});
+
+        return socket.io.emit("salas", rooms);
 
     } catch (error) {
         console.log(error)
@@ -339,11 +369,30 @@ exports.sendMessageToTheRoom = async (req, res) => {
         await message.save();
 
         room.last_message = message._id;
+        room.last_message_at = Date.now();
         await room.save();
 
-        return res.status(201).json({
-            succes: true
+        res.status(201).json({
+            success: true
         })
+
+        const messages = await Messages.find({
+            room: idRoom
+        }).sort({ create_at: 'asc' }).populate('user', '_id name lastname email auth_level');
+
+        socket.io.emit(`room-${room._id}`, messages);
+
+        const rooms = await Room.find({
+            activated: 1
+        })
+            .populate('user', '_id name lastname email auth_level')
+            .populate({
+                path: 'last_message',
+                populate: { path: 'user' }
+            })
+            .sort({ last_message_at: '-1' });
+
+        return socket.io.emit("salas", rooms);
 
     } catch (error) {
         console.log(error)
