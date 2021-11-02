@@ -17,6 +17,9 @@ const roomSchema = new Schema({
         type: Schema.ObjectId,
         ref: 'Messages'
     },
+    last_message_at: {
+        type: Date,
+    },
 
     activated: {
         type: Number,
