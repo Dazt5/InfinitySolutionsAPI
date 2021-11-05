@@ -236,10 +236,16 @@ module.exports = () => {
         userController.createAdmin
     );
 
-        //USERS
-        router.get('/admins',
+    //ADMINS
+    router.get('/admins',
         authAdmin,
         userController.getAllAdmins
+    );
+
+    router.post('/admin/activate/:userId',
+        authAdmin,
+        validationHandler(Joi.object({ userId: idUserSchema }), 'params'),
+        userController.activateAdmin
     );
 
     /* ADMIN DASHBOARD */

@@ -1,6 +1,8 @@
 const User = require('../models/User');
 const Ticket = require('../models/Tickets');
 
+const ADMIN_EMAIL = "admin@infinitySolutions.com";
+
 /*  HELPERS AND LIBS    */
 const { decodeToken } = require('../libs/authToken');
 const { hashPassword, comparePassword } = require('../libs/bcrypt');
@@ -214,6 +216,62 @@ exports.getUserByEmail = async (req, res) => {
 }
 
 
+exports.activateAdmin = async (req, res) => {
+
+    const { userId } = req.params;
+
+    const { email } = decodeToken(res.locals.token);
+
+    try {
+        
+        const admin = await User.findOne({
+            email,
+            auth_level:2
+        });
+
+
+        if (!admin) {
+            return res.status(403).json({
+                success: false,
+                message: "No tiene autorización para realizar esta solicitud"
+            });
+        }
+
+        const user = await User.findOne({
+            _id: userId,
+            auth_level:2
+        });
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "El usuario al que hace referencia no existe."
+            });
+        } else if (user.email === admin.email) {
+            return res.status(400).json({
+                success: false,
+                message: "El usuario maestro no puede ser desactivado."
+            });
+        }
+
+        user.activated = !user.activated;
+
+        await user.save();
+
+        return res.status(200).json({
+            success: true,
+            message: "Modificación exitosa."
+        });
+
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            success: false,
+            message: "Ha ocurrido un error inesperado..."
+        });
+    }
+}
+
 exports.createAdmin = async (req, res) => {
 
     const { email, name, lastname, phone_number, password } = req.body;
@@ -253,7 +311,7 @@ exports.createAdmin = async (req, res) => {
 
         return res.status(200).json({
             success: true,
-            message: "Administrador registrado, verifique su Email para activar su cuenta."
+            message: "Administrador registrado, Verifique el email registrado para activar."
         });
 
     } catch (error) {
