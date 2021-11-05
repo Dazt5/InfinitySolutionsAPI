@@ -247,7 +247,7 @@ exports.activateAdmin = async (req, res) => {
                 success: false,
                 message: "El usuario al que hace referencia no existe."
             });
-        } else if (user.email === admin.email) {
+        } else if (user.email === ADMIN_EMAIL) {
             return res.status(400).json({
                 success: false,
                 message: "El usuario maestro no puede ser desactivado."
