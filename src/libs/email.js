@@ -35,6 +35,7 @@ exports.send = async (options) => {
         subject: options.subject,
         template: options.view,
         context: {
+            subject:options.subject,
             url: options.url,
         }
     }

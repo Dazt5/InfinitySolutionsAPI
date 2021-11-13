@@ -1,7 +1,7 @@
 const User = require('../models/User');
 const Ticket = require('../models/Tickets');
 
-const ADMIN_EMAIL = "admin@infinitySolutions.com";
+const MASTER_ADMIN_EMAIL = "admin@infinitysolutions.com";
 
 /*  HELPERS AND LIBS    */
 const { decodeToken } = require('../libs/authToken');
@@ -229,11 +229,10 @@ exports.activateAdmin = async (req, res) => {
             auth_level:2
         });
 
-
-        if (!admin) {
+        if (admin.email != MASTER_ADMIN_EMAIL) {
             return res.status(403).json({
                 success: false,
-                message: "No tiene autorización para realizar esta solicitud"
+                message: "No tiene autorización para realizar esta solicitud, ingrese con el usuario maestro"
             });
         }
 
@@ -247,7 +246,7 @@ exports.activateAdmin = async (req, res) => {
                 success: false,
                 message: "El usuario al que hace referencia no existe."
             });
-        } else if (user.email === ADMIN_EMAIL) {
+        } else if (user.email === MASTER_ADMIN_EMAIL) {
             return res.status(400).json({
                 success: false,
                 message: "El usuario maestro no puede ser desactivado."
