@@ -7,6 +7,7 @@ let transport = nodemailer.createTransport({
 
     host: emailConfig.host,
     port: emailConfig.port,
+    secure: false,
     auth: {
         user: emailConfig.user,
         pass: emailConfig.pass
