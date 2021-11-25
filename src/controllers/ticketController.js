@@ -342,14 +342,19 @@ exports.addTicketResponse = async (req, res) => {
             });
         }
 
+        const waitingStatus = await Status.findOne({
+            name: "waiting"
+        });
+
         const validTicket = await Ticket.findOne({
-            _id: idTicket
+            _id: idTicket,
+            status: waitingStatus._id
         });
 
         if (!validTicket) {
             return res.status(404).json({
                 success: false,
-                message: 'El ticket al que hace referencia no está disponible'
+                message: 'El ticket al que hace referencia no está o se encuentra cerrado.'
             })
         }
 
