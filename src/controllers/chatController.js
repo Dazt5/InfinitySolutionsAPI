@@ -4,6 +4,7 @@ const Messages = require('../models/Messages');
 const { decodeToken } = require('../libs/authToken');
 const { socket } = require('../libs/socket');
 const Tickets = require('../models/Tickets');
+const TicketResponse = require('../models/TicketResponse');
 
 exports.activateRoom = async (req, res) => {
     const { idTicket } = req.params;
@@ -52,6 +53,14 @@ exports.activateRoom = async (req, res) => {
                 message: 'La sala de chat ya se encuentra activada.'
             });
         }
+
+        const openResponse = new TicketResponse({
+            message: 'Chat Elevado Por el administrador <a href="/chat">Click aqui para acceder</a>',
+            ticket: room.activate_for_ticket,
+            user: room.user
+        });
+
+        await openResponse.save();
 
         const rooms = await Room.find({
             activated: 1
@@ -112,6 +121,14 @@ exports.desactivateRoom = async (req, res) => {
             .sort({last_message_at: '-1'});
 
         socket.io.emit("salas", rooms);
+
+        const closeResponse = new TicketResponse({
+            message: "El administrador ha cerrado su sesión de chat vinculada a este ticket.",
+            ticket: room.activate_for_ticket,
+            user: room.user
+        });
+
+        await closeResponse.save();
 
         return res.status(200).json({
             success: true,
