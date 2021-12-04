@@ -41,9 +41,18 @@ exports.activateRoom = async (req, res) => {
             });
         } else if (room.activated == 0) {
             room.activated = 1;
+
+            const openResponse = new TicketResponse({
+                message: 'Chat Elevado Por el administrador <a href="/chat">Click aqui para acceder</a>',
+                ticket: room.activate_for_ticket,
+                user: room.user
+            });
+    
+            await openResponse.save();
+
             await room.save();
 
-            res.status(201).json({
+            return res.status(201).json({
                 success: true,
                 message: 'Se ha activado la sala de chat'
             });
