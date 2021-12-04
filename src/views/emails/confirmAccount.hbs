@@ -2,9 +2,9 @@
 
     <h1 style="text-align:center; 
         font-family: Arial, Helvetica;
-    ">Confirma tu Cuenta</h1>
+    ">{{subject}}</h1>
 
-    <p style="font-family: Arial, Helvetica;">Hola, Para confirmar tu cuenta, haz click en el siguiente
+    <p style="font-family: Arial, Helvetica;">Hola, Para completar la operación, haz click en el siguiente
         botón, este enlace es temporal, si se vence es necesario que vuelvas a solicitar otro e-mail.</p>
 
     <a style="
@@ -15,9 +15,10 @@
         color:white; 
         text-transform:uppercase; 
         text-align:center;
-        text-decoration: none;" href="{{url}}">Confirmar Cuenta</a>
+        text-decoration: none;" href="{{url}}">{{subject}}</a>
 
-    <p style="font-family: Arial, Helvetica;">Si no puedes acceder a este enlace, visita: {{url}}</p>
+    <p style="font-family: Arial, Helvetica;">Si no puedes visualizar el botón
+        <a href="{{url}}" style="color: cornsilk;">Haz click aquí</a></p>
     <p style="font-family: Arial, Helvetica;">Si no solicitaste este e-mail, puedes ignorarlo</p>
 
 </body>

@@ -58,6 +58,10 @@ const {
     statusSchema
 } = require('../libs/schemas/status');
 
+const {
+    idMessageAndRoomSchema,
+} = require('../libs/schemas/chat');
+
 /**VALIDATION HANDLER*/
 const validationHandler = require('../middlewares/validationHandler');
 
@@ -99,7 +103,6 @@ module.exports = () => {
     );
 
     /*USER*/
-
     router.get('/user',
         authUser,
         userController.getUser
@@ -115,6 +118,12 @@ module.exports = () => {
         authUser,
         validationHandler(changeProfileSchema),
         userController.changeProfile
+    );
+
+    /* ADMIN DASHBOARD */
+    router.get('/user/dashboard',
+        authUser,
+        userController.getUserResume
     );
 
     /*TICKETS*/
@@ -164,9 +173,9 @@ module.exports = () => {
         favoriteController.addFavorite
     );
 
-    router.delete('/favorite/:idFavorite',
+    router.delete('/favorite/:idCorporation',
         authUser,
-        validationHandler(Joi.object({ idFavorite: idFavoriteSchema }), 'params'),
+        validationHandler(Joi.object({ idCorporation: idCorporationSchema }), 'params'),
         favoriteController.deleteFavorite
     );
 
@@ -215,18 +224,52 @@ module.exports = () => {
 
     /*------- ADMIN ROUTES ---------*/
 
-    //GET ALL USERS //
-
+    //USERS
     router.get('/users',
         authAdmin,
         userController.getAllUsers
     );
 
+    router.post('/admin',
+        authAdmin,
+        validationHandler(signupSchema),
+        userController.createAdmin
+    );
+
+    //ADMINS
+    router.get('/admins',
+        authAdmin,
+        userController.getAllAdmins
+    );
+
+    router.post('/admin/activate/:userId',
+        authAdmin,
+        validationHandler(Joi.object({ userId: idUserSchema }), 'params'),
+        userController.activateAdmin
+    );
+
+    /* ADMIN DASHBOARD */
+    router.get('/admin/dashboard',
+        authAdmin,
+        userController.getAdminResume
+    )
+
     //* ADMIN TICKETS *//
+
+    router.get('/admin/ticket',
+        authAdmin,
+        ticketController.showAllTickets
+    );
 
     router.get('/ticket/status/waiting',
         authAdmin,
         ticketController.showWaitingTickets
+    );
+
+    router.patch('/ticket/:idTicket',
+        authAdmin,
+        validationHandler(Joi.object({ idTicket: idTicketSchema }), 'params'),
+        ticketController.changeTicketStatus
     );
 
     router.get('/user/profile/:userId',
@@ -239,13 +282,6 @@ module.exports = () => {
         authAdmin,
         validationHandler(Joi.object({ email: userEmailSchema }), 'params'),
         userController.getUserByEmail
-    );
-
-    //* ADMIN TICKETS */
-    router.patch('/ticket/:idTicket',
-        authAdmin,
-        validationHandler(Joi.object({ idTicket: idTicketSchema }), 'params'),
-        ticketController.changeTicketStatus
     );
 
     //* CORPORATION */
@@ -356,7 +392,6 @@ module.exports = () => {
         faqController.deleteFaq
     );
 
-
     /*STATUS*/
 
     router.get('/status',
@@ -373,7 +408,6 @@ module.exports = () => {
     router.post('/status/new',
         authAdmin,
         validationHandler(statusSchema),
-        statusController.validateStatus,
         statusController.newStatus
     );
 
@@ -387,6 +421,41 @@ module.exports = () => {
         authAdmin,
         validationHandler(Joi.object({ idStatus: idStatusSchema }), 'params'),
         statusController.deleteStatus
+    );
+
+    /**** CHAT ****/
+
+    //Activate room
+    router.post('/admin/chat/activate/:idTicket',
+        authAdmin,
+        validationHandler(Joi.object({ idTicket: idTicketSchema }), 'params'),
+        chatController.activateRoom
+    );
+
+    //Desactivate room
+    router.post('/admin/chat/desactivate/:idRoom',
+        authAdmin,
+        validationHandler(Joi.object({ idRoom: idMessageAndRoomSchema }), 'params'),
+        chatController.desactivateRoom
+    );
+
+    //Get all rooms
+    router.get('/admin/chat/room',
+        authAdmin,
+        chatController.getRooms
+    );
+
+    //Get messages in the room
+    router.get('/admin/chat/:idRoom',
+        authAdmin,
+        validationHandler(Joi.object({ idRoom: idMessageAndRoomSchema }), 'params'),
+        chatController.getMessagesInRoom
+    );
+
+    router.post('/admin/chat/:idRoom',
+        authAdmin,
+        validationHandler(Joi.object({ idRoom: idMessageAndRoomSchema }), 'params'),
+        chatController.sendMessageToTheRoom
     );
 
     return router;

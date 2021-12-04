@@ -25,7 +25,7 @@ exports.showAllUserTickets = async (_, res) => {
         const ticket = await Ticket.find(
             { user: user._id })
             .populate('corporation', 'name rif image')
-            .populate('status', 'name color');
+            .populate('status', 'name');
 
         if (!ticket) {
             return res.status(401).json({
@@ -66,7 +66,7 @@ exports.showUserTicket = async (req, res) => {
             })
             .populate('user', '_id name lastname email phone_number auth_level activated last_access')
             .populate('corporation', 'name rif image')
-            .populate('status', 'name color');
+            .populate('status', 'name');
 
         if (!ticket) {
             return res.status(404).json({
@@ -102,13 +102,12 @@ exports.showLastUserTicket = async (req, res) => {
             });
         }
 
-        const lastTickets = await Ticket.find(
-            { user: user._id })
+        const lastTickets = await Ticket.find({ user: user._id })
             .populate('corporation', 'name rif image')
-            .populate('status', 'name color');
+            .populate('status', 'name');
 
         return res.status(200).json({
-            success: false,
+            success: true,
             lastTickets
         });
 
@@ -127,12 +126,12 @@ exports.showWaitingTickets = async (req, res) => {
 
         const status = await Status.findOne({
             name: 'waiting'
-        })
+        }).populate('status', 'name')
 
         if (!status) {
             return res.status(404).json({
-                success: true,
-                message:"La información a la que hace referencia no está disponible"
+                success: false,
+                message: "La información a la que hace referencia no está disponible"
             });
         }
 
@@ -143,6 +142,27 @@ exports.showWaitingTickets = async (req, res) => {
         return res.status(200).json({
             success: true,
             allTickets
+        });
+
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            success: false,
+            message: 'No se ha podido procesar la solicitud'
+        });
+    }
+}
+
+exports.showAllTickets = async (req, res) => {
+
+    try {
+
+        const tickets = await Ticket.find()
+            .populate('corporation', 'name rif image').populate('status', 'name');
+
+        return res.status(200).json({
+            success: true,
+            tickets
         });
 
     } catch (error) {
@@ -322,14 +342,19 @@ exports.addTicketResponse = async (req, res) => {
             });
         }
 
+        const waitingStatus = await Status.findOne({
+            name: "waiting"
+        });
+
         const validTicket = await Ticket.findOne({
-            _id: idTicket
+            _id: idTicket,
+            status: waitingStatus._id
         });
 
         if (!validTicket) {
             return res.status(404).json({
                 success: false,
-                message: 'El ticket al que hace referencia no está disponible'
+                message: 'El ticket al que hace referencia no está o se encuentra cerrado.'
             })
         }
 
@@ -384,7 +409,7 @@ exports.getTicketsResponse = async (req, res) => {
 
         const ticketResponse = await TicketResponse.find({
             ticket: idTicket
-        }).sort({ create_at: 'asc' }).populate('User', '_id name lastname email auth_level')
+        }).sort({ create_at: 'asc' }).populate('user', '_id name lastname email auth_level')
 
         return res.status(200).json({
             success: true,

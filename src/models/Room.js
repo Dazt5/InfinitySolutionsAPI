@@ -12,6 +12,24 @@ const roomSchema = new Schema({
         type: Date,
         default: Date.now()
     },
+
+    last_message: {
+        type: Schema.ObjectId,
+        ref: 'Messages'
+    },
+    last_message_at: {
+        type: Date,
+    },
+
+    activated: {
+        type: Number,
+        default: 0
+    },
+
+    activate_for_ticket: {
+        type: Schema.ObjectId,
+        ref: 'Tickets'
+    }
 })
 
 module.exports = mongoose.model('Room', roomSchema);

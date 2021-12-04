@@ -16,10 +16,10 @@ const faqSchema = Joi.object({
         'string.empty': 'El titulo no debe ir vacio'
     }),
 
-    description: Joi.string().min(20).max(200).required().messages({
+    description: Joi.string().min(20).max(500).required().messages({
         'any.required': 'Debe ingresar una descripcion',
         'string.min': 'La descripción tiene que tener minimo 20 caracteres',
-        'string.max': 'La descripcion no puede tener mas de 200 caracteres',
+        'string.max': 'La descripcion no puede tener mas de 500 caracteres',
         'string.empty': 'La descripcion no debe ir vacia'
     }),
 

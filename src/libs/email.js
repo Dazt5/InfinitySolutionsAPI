@@ -7,6 +7,7 @@ let transport = nodemailer.createTransport({
 
     host: emailConfig.host,
     port: emailConfig.port,
+    secure: false,
     auth: {
         user: emailConfig.user,
         pass: emailConfig.pass
@@ -35,6 +36,7 @@ exports.send = async (options) => {
         subject: options.subject,
         template: options.view,
         context: {
+            subject:options.subject,
             url: options.url,
         }
     }
