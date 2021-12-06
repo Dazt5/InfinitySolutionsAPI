@@ -33,6 +33,14 @@ exports.activateRoom = async (req, res) => {
                 activate_for_ticket: ticket._id
             });
 
+            const openResponse = new TicketResponse({
+                message: 'Chat Elevado Por el administrador <a href="/chat">Click aqui para acceder</a>',
+                ticket: newRoom.activate_for_ticket,
+                user: newRoom.user
+            });
+    
+            await openResponse.save();
+
             await newRoom.save();
 
             res.status(201).json({

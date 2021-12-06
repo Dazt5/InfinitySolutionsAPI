@@ -212,6 +212,34 @@ exports.desactivateCorporation = async (req, res) => {
 exports.showAllCorporation = async (_, res) => {
 
     try {
+        const corporation = await Corporation.find({
+            active:1
+        });
+
+        if (!corporation) {
+            return res.status(404).json({
+                success: false,
+                message: 'No se encontró la informaciónp solicitada'
+            })
+        }
+
+        return res.status(200).json({
+            success: true,
+            corporation
+        });
+
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            success: false,
+            message: 'Ha ocurrido un error procesando la solicitud'
+        });
+    }
+}
+
+exports.showAllAdminCorporation = async (_, res) => {
+
+    try {
         const corporation = await Corporation.find();
 
         if (!corporation) {

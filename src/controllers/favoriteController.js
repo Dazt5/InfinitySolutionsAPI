@@ -23,7 +23,7 @@ exports.showFavorites = async (_, res) => {
 
         const favorite = await Favorite.find({
             user: user.id
-        })/*.populate('user')*/.populate('corporation', '_id name rif image');
+        })/*.populate('user')*/.populate('corporation', '_id name rif image active');
 
         if (!favorite) {
             return res.status(404).json({

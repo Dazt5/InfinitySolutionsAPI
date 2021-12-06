@@ -285,6 +285,12 @@ module.exports = () => {
     );
 
     //* CORPORATION */
+
+    router.get('/admin/corporation',
+        authAdmin,
+        corporationController.showAllAdminCorporation,
+    );
+
     router.post('/corporation/new',
         authAdmin,
         corporationController.uploadPicture,
