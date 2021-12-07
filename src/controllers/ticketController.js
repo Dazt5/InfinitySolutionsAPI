@@ -221,6 +221,7 @@ exports.newTicket = async (req, res) => {
         ticket.user = validUser._id;
         ticket.corporation = corporation
         ticket.status = defaultStatus._id;
+        ticket.create_at = Date.now();
 
         await ticket.save();
 
@@ -362,6 +363,7 @@ exports.addTicketResponse = async (req, res) => {
 
         newResponse.ticket = validTicket._id;
         newResponse.user = validUser._id;
+        newResponse.create_at = Date.now();
 
         newResponse.save();
 

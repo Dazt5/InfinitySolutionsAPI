@@ -234,6 +234,7 @@ exports.sendMessage = async (req, res) => {
         }
 
         const newMessage = new Messages({ message, user: user._id, room: room._id });
+        newMessage.create_at = Date.now();
         await newMessage.save();
 
         room.last_message = newMessage._id;
@@ -399,6 +400,7 @@ exports.sendMessageToTheRoom = async (req, res) => {
 
         message.room = room._id;
         message.user = user._id;
+        message.create_at = Date.now();
 
         await message.save();
 
